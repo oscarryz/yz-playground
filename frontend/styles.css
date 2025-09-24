@@ -155,6 +155,108 @@ body {
     background: white;
 }
 
+/* CodeMirror Editor Styles */
+.CodeMirror {
+    height: 400px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    border: none;
+    border-radius: 12px;
+    background: #fafbfc;
+}
+
+.CodeMirror:focus {
+    background: white;
+}
+
+.CodeMirror-gutters {
+    background: #f8f9fa;
+    border-right: 1px solid #e9ecef;
+    border-radius: 12px 0 0 12px;
+}
+
+.CodeMirror-linenumber {
+    color: #6c757d;
+    padding: 0 8px;
+}
+
+.CodeMirror-cursor {
+    border-left: 2px solid #667eea;
+}
+
+.CodeMirror-selected {
+    background: rgba(102, 126, 234, 0.2);
+}
+
+.CodeMirror-focused .CodeMirror-selected {
+    background: rgba(102, 126, 234, 0.3);
+}
+
+/* Editor Options */
+.editor-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid #f0f0f0;
+    gap: 20px;
+}
+
+.theme-selector,
+.font-size-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.theme-selector label,
+.font-size-selector label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #666;
+}
+
+.theme-select,
+.font-size-select {
+    padding: 6px 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    background: white;
+    font-size: 0.9rem;
+    color: #333;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.theme-select:focus,
+.font-size-select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* CodeMirror Theme Overrides */
+.CodeMirror.cm-s-material {
+    background: #263238;
+    color: #eeffff;
+}
+
+.CodeMirror.cm-s-monokai {
+    background: #272822;
+    color: #f8f8f2;
+}
+
+.CodeMirror.cm-s-solarized {
+    background: #fdf6e3;
+    color: #586e75;
+}
+
+.CodeMirror.cm-s-solarized.CodeMirror.cm-s-solarized-dark {
+    background: #002b36;
+    color: #839496;
+}
+
 /* Output Section */
 .output-section {
     background: rgba(255, 255, 255, 0.95);
