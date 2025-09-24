@@ -170,3 +170,4 @@ coverage/
 # Profiling
 *.prof
 *.pprof
+backend/server
