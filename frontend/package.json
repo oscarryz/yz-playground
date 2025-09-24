@@ -1,0 +1,16 @@
+{
+  "name": "yz-playground-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Yz Programming Language Playground",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 3000",
+    "build": "echo 'No build step needed for vanilla JS'",
+    "serve": "python3 -m http.server 3000"
+  },
+  "keywords": ["yz", "playground", "programming", "language"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {}
+}

@@ -14,40 +14,41 @@ services:
     command: sleep infinity  # Keep container running
     restart: unless-stopped
 
-  # TODO: Add backend and frontend services once their Dockerfiles are created
-  # backend:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   container_name: yz-backend
-  #   ports:
-  #     - "8080:8080"
-  #   volumes:
-  #     - ./backend:/app
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   depends_on:
-  #     - sandbox
-  #   environment:
-  #     - PORT=8080
-  #     - SANDBOX_CONTAINER=yz-sandbox
-  #     - YZ_COMPILER_PATH=/usr/local/bin/yzc
-  #   restart: unless-stopped
+  # Backend API server
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: yz-backend
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - sandbox
+    environment:
+      - PORT=8080
+      - SANDBOX_CONTAINER=yz-sandbox
+      - YZ_COMPILER_PATH=/usr/local/bin/yzc
+    restart: unless-stopped
 
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   container_name: yz-frontend
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./frontend:/app
-  #   depends_on:
-  #     - backend
-  #   environment:
-  #     - PORT=3000
-  #     - API_URL=http://backend:8080
-  #   restart: unless-stopped
+  # Frontend web server
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: yz-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+    depends_on:
+      - backend
+    environment:
+      - PORT=3000
+      - API_URL=http://backend:8080
+    restart: unless-stopped
 
 volumes:
   yz-executions:

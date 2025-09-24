@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yz Programming Language Playground</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CodeMirror CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/material.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/solarized.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="title">Yz Playground</h1>
+                <p class="subtitle">Write, compile, and run Yz code in your browser</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Code Editor Section -->
+            <section class="editor-section">
+                <div class="editor-header">
+                    <h2>Editor</h2>
+                    <div class="editor-controls">
+                        <button id="run-btn" class="btn btn-primary">
+                            <span class="btn-icon">▶</span>
+                            Run
+                        </button>
+                        <button id="clear-btn" class="btn btn-secondary">
+                            <span class="btn-icon">🗑</span>
+                            Clear
+                        </button>
+                        <button id="share-btn" class="btn btn-secondary">
+                            <span class="btn-icon">🔗</span>
+                            Share
+                        </button>
+                    </div>
+                </div>
+                <div class="editor-container">
+                    <textarea id="code-editor" class="code-editor" placeholder="// Write your Yz code here
+main : {
+    println(\"Hello, World!\")
+}"></textarea>
+                </div>
+                
+                <!-- Editor Options -->
+                <div class="editor-options">
+                    <div class="theme-selector">
+                        <label for="theme-select">Theme:</label>
+                        <select id="theme-select" class="theme-select">
+                            <option value="default">Default</option>
+                            <option value="material">Material</option>
+                            <option value="monokai">Monokai</option>
+                            <option value="solarized">Solarized</option>
+                        </select>
+                    </div>
+                    <div class="font-size-selector">
+                        <label for="font-size-select">Font Size:</label>
+                        <select id="font-size-select" class="font-size-select">
+                            <option value="12">12px</option>
+                            <option value="14" selected>14px</option>
+                            <option value="16">16px</option>
+                            <option value="18">18px</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Output Section -->
+            <section class="output-section">
+                <div class="output-header">
+                    <h2>Output</h2>
+                    <div class="output-status" id="output-status">
+                        <span class="status-icon">⏳</span>
+                        <span class="status-text">Ready</span>
+                    </div>
+                </div>
+                <div class="output-container">
+                    <pre id="output-content" class="output-content"></pre>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>Built with ❤️ for the Yz programming language</p>
+                <div class="footer-links">
+                    <a href="#" id="compiler-version">Compiler Version</a>
+                    <a href="#" id="config-link">Configuration</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Executing your code...</p>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Error</h3>
+                <button id="close-error" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <pre id="error-content"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- CodeMirror JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/continuelist.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/brace-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/comment-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/selection/active-line.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/search.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/search/searchcursor.min.js"></script>
+    
+    <script src="app.js"></script>
+</body>
+</html>
