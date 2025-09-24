@@ -21,7 +21,7 @@ A secure, web-based playground for the Yz programming language that allows users
 
 ### Prerequisites
 
-- Go 1.22+ for backend development
+- Go 1.23+ for backend development (required by Yz compiler)
 - Docker and Docker Compose for sandboxing (isolate requires Linux)
 - macOS for development (Linux required for isolate sandboxing)
 - Modern web browser for frontend development

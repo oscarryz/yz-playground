@@ -9,10 +9,20 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     libcap-dev \
     libsystemd-dev \
-    golang-go \
     git \
     curl \
+    wget \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Go 1.23 (required by Yz compiler)
+RUN wget https://go.dev/dl/go1.23.0.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go1.23.0.linux-amd64.tar.gz && \
+    rm go1.23.0.linux-amd64.tar.gz
+
+# Set Go environment variables
+ENV PATH="/usr/local/go/bin:${PATH}"
+ENV GOPATH="/go"
+ENV GOCACHE="/tmp/go-cache"
 
 # Install isolate
 RUN git clone https://github.com/ioi/isolate.git /tmp/isolate && \
@@ -24,6 +34,8 @@ RUN git clone https://github.com/ioi/isolate.git /tmp/isolate && \
 # Install Yz compiler
 RUN git clone https://github.com/oscarryz/yz.git /tmp/yz && \
     cd /tmp/yz && \
+    go version && \
+    go mod tidy && \
     go build -o /usr/local/bin/yzc ./cmd/yzc && \
     chmod +x /usr/local/bin/yzc && \
     rm -rf /tmp/yz
