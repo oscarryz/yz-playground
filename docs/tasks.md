@@ -24,23 +24,23 @@ This document outlines all the tasks needed to implement the Yz programming lang
 ### 3. Docker Sandbox Integration
 - [x] 3.1 Create Docker sandbox image with isolate and Yz compiler
 - [x] 3.2 Set up Docker Compose configuration
-- [ ] 3.3 Create Docker API wrapper functions in Go
-- [ ] 3.4 Implement container creation and cleanup
-- [ ] 3.5 Add resource limit configuration (memory, CPU, time)
-- [ ] 3.6 Test Docker sandbox integration with simple commands
-- [ ] 3.7 Implement filesystem isolation setup
-- [ ] 3.8 Add network isolation configuration
-- [ ] 3.9 Create sandbox configuration validation
+- [x] 3.3 Create Docker API wrapper functions in Go
+- [x] 3.4 Implement container creation and cleanup
+- [x] 3.5 Add resource limit configuration (memory, CPU, time)
+- [x] 3.6 Test Docker sandbox integration with simple commands
+- [x] 3.7 Implement filesystem isolation setup
+- [x] 3.8 Add network isolation configuration
+- [x] 3.9 Create sandbox configuration validation
 
 ### 4. Core API Development
-- [ ] 4.1 Design and implement code execution endpoint
-- [ ] 4.2 Add input validation for code submissions
-- [ ] 4.3 Implement request/response structures
-- [ ] 4.4 Add error handling and status codes
-- [ ] 4.5 Create execution timeout handling
-- [ ] 4.6 Implement memory usage tracking
-- [ ] 4.7 Add execution time measurement
-- [ ] 4.8 Create API configuration endpoint
+- [x] 4.1 Design and implement code execution endpoint
+- [x] 4.2 Add input validation for code submissions
+- [x] 4.3 Implement request/response structures
+- [x] 4.4 Add error handling and status codes
+- [x] 4.5 Create execution timeout handling
+- [x] 4.6 Implement memory usage tracking
+- [x] 4.7 Add execution time measurement
+- [x] 4.8 Create API configuration endpoint
 
 ### 5. Yz Compiler Integration
 - [x] 5.1 Clone and build Yz compiler from https://github.com/oscarryz/yz
@@ -260,11 +260,11 @@ This document outlines all the tasks needed to implement the Yz programming lang
 
 **Total Tasks**: 156 tasks across 26 categories
 
-**Progress**: [x] 15/156 completed
+**Progress**: [x] 31/156 completed
 
 **Current Phase**: Phase 1 - Project Setup and Backend Foundation
 
-**Next Priority**: Task 3.3 - Create Docker API wrapper functions in Go
+**Next Priority**: Task 5.3 - Create compiler execution wrapper
 
 ---
 

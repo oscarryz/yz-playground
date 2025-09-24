@@ -3,17 +3,28 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
+	"time"
+
+	"yz-playground/internal/config"
+	"yz-playground/internal/sandbox"
+	"yz-playground/pkg/api"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	// Get port from environment variable or use default
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
+	// Load configuration
+	cfg := config.Load()
+
+	// Initialize sandbox manager
+	sandboxConfig := &sandbox.SandboxConfig{
+		ImageName:        "yz-sandbox",
+		MaxMemory:        int64(cfg.MaxMemory) * 1024 * 1024, // Convert MB to bytes
+		MaxExecutionTime: cfg.MaxExecutionTime / 1000,        // Convert ms to seconds
+		WorkingDir:       "/workspace",
 	}
+	sandboxManager := sandbox.NewManager(sandboxConfig)
+	defer sandboxManager.Cleanup()
 
 	// Initialize Gin router
 	r := gin.Default()
@@ -34,35 +45,55 @@ func main() {
 
 	// Health check endpoint
 	r.GET("/api/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"status":  "healthy",
-			"service": "yz-playground-backend",
+		c.JSON(http.StatusOK, api.HealthResponse{
+			Status:  "healthy",
+			Service: "yz-playground-backend",
 		})
 	})
 
 	// API configuration endpoint
 	r.GET("/api/config", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"max_execution_time": 10000,
-			"max_memory":         256,
-			"max_code_size":      10000,
+		c.JSON(http.StatusOK, api.ConfigResponse{
+			MaxExecutionTime: cfg.MaxExecutionTime,
+			MaxMemory:        cfg.MaxMemory,
+			MaxCodeSize:      cfg.MaxCodeSize,
 		})
 	})
 
-	// Code execution endpoint (placeholder)
+	// Code execution endpoint
 	r.POST("/api/execute", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"success":        true,
-			"output":         "Code execution endpoint - coming soon!",
-			"error":          "",
-			"execution_time": 0,
-			"memory_used":    0,
+		var req api.ExecuteRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Validate code size
+		if len(req.Code) > cfg.MaxCodeSize {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Code size exceeds maximum limit"})
+			return
+		}
+
+		// Execute code in sandbox
+		timeout := time.Duration(cfg.MaxExecutionTime) * time.Millisecond
+		result, err := sandboxManager.ExecuteWithTimeout(c.Request.Context(), req.Code, timeout)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, api.ExecuteResponse{
+			Success:       result.Success,
+			Output:        result.Output,
+			Error:         result.Error,
+			ExecutionTime: result.ExecutionTime,
+			MemoryUsed:    int(result.MemoryUsed / 1024 / 1024), // Convert bytes to MB
 		})
 	})
 
 	// Start server
-	log.Printf("Starting Yz Playground Backend on port %s", port)
-	if err := r.Run(":" + port); err != nil {
+	log.Printf("Starting Yz Playground Backend on port %s", cfg.Port)
+	if err := r.Run(":" + cfg.Port); err != nil {
 		log.Fatal("Failed to start server:", err)
 	}
 }
