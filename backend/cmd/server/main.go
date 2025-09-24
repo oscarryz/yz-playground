@@ -22,6 +22,7 @@ func main() {
 		MaxMemory:        int64(cfg.MaxMemory) * 1024 * 1024, // Convert MB to bytes
 		MaxExecutionTime: cfg.MaxExecutionTime / 1000,        // Convert ms to seconds
 		WorkingDir:       "/workspace",
+		CompilerPath:     cfg.YZCompilerPath,
 	}
 	sandboxManager := sandbox.NewManager(sandboxConfig)
 	defer sandboxManager.Cleanup()
@@ -58,6 +59,25 @@ func main() {
 			MaxMemory:        cfg.MaxMemory,
 			MaxCodeSize:      cfg.MaxCodeSize,
 		})
+	})
+
+	// Compiler version endpoint
+	r.GET("/api/compiler/version", func(c *gin.Context) {
+		// Get a sandbox instance to check compiler version
+		sandbox, err := sandboxManager.GetSandbox("version-check")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get sandbox instance"})
+			return
+		}
+		defer sandbox.Close()
+
+		version, err := sandbox.GetCompilerVersion(c.Request.Context())
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get compiler version"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"version": version})
 	})
 
 	// Code execution endpoint

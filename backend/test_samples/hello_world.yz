@@ -1,0 +1,4 @@
+// Simple Hello World program in Yz
+main : {
+    println("Hello, World from Yz!")
+}

@@ -1,0 +1,5 @@
+// Invalid Yz syntax for testing error handling
+func main() {
+    print("This has invalid syntax
+    // Missing closing quote and parenthesis
+}

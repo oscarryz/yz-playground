@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"yz-playground/internal/compiler"
+
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
@@ -19,6 +21,7 @@ type Sandbox struct {
 	client    *client.Client
 	imageName string
 	config    *SandboxConfig
+	compiler  *compiler.Compiler
 }
 
 // SandboxConfig holds sandbox configuration
@@ -27,6 +30,7 @@ type SandboxConfig struct {
 	MaxMemory        int64 // in bytes
 	MaxExecutionTime int   // in seconds
 	WorkingDir       string
+	CompilerPath     string
 }
 
 // ExecutionResult holds the result of code execution
@@ -45,10 +49,18 @@ func New(config *SandboxConfig) (*Sandbox, error) {
 		return nil, fmt.Errorf("failed to create Docker client: %w", err)
 	}
 
+	// Initialize compiler
+	compilerInstance := compiler.New(
+		config.CompilerPath,
+		config.WorkingDir,
+		time.Duration(config.MaxExecutionTime)*time.Second,
+	)
+
 	return &Sandbox{
 		client:    cli,
 		imageName: config.ImageName,
 		config:    config,
+		compiler:  compilerInstance,
 	}, nil
 }
 
@@ -92,6 +104,16 @@ func (s *Sandbox) ExecuteCode(ctx context.Context, code string) (*ExecutionResul
 	}
 
 	return result, nil
+}
+
+// GetCompilerVersion returns the Yz compiler version
+func (s *Sandbox) GetCompilerVersion(ctx context.Context) (string, error) {
+	return s.compiler.GetVersion(ctx)
+}
+
+// ValidateCompiler validates that the compiler is working
+func (s *Sandbox) ValidateCompiler(ctx context.Context) error {
+	return s.compiler.ValidateCompiler(ctx)
 }
 
 // createTempDir creates a temporary directory for execution
