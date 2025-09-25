@@ -116,6 +116,7 @@ body {
     height: 100%;
     width: 100%;
     position: relative;
+    overflow: hidden; /* Let CodeMirror handle its own scrolling */
 }
 
 /* CodeMirror Editor Styles */
@@ -127,6 +128,7 @@ body {
     background: #131415 !important;
     color: #ffffff !important;
     border: none !important;
+    overflow: auto !important;
 }
 
 .CodeMirror-focused {
@@ -149,6 +151,41 @@ body {
 
 .CodeMirror-selected {
     background: rgba(0, 122, 204, 0.2) !important;
+}
+
+/* Custom Scrollbar for CodeMirror */
+.CodeMirror ::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+}
+
+.CodeMirror ::-webkit-scrollbar-track {
+    background: #131415;
+    border-radius: 7px;
+}
+
+.CodeMirror ::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 7px;
+    border: 2px solid #131415;
+    min-height: 20px;
+}
+
+.CodeMirror ::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+.CodeMirror ::-webkit-scrollbar-corner {
+    background: #131415;
+}
+
+/* Ensure CodeMirror scrollbars are always visible when needed */
+.CodeMirror-scrollbar-filler {
+    background: #131415;
+}
+
+.CodeMirror-hscrollbar, .CodeMirror-vscrollbar {
+    background: #131415;
 }
 
 .CodeMirror-focused .CodeMirror-selected {

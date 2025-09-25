@@ -40,7 +40,8 @@ class YzPlayground {
             mode: 'yz',
             theme: 'default',
             lineNumbers: true,
-            lineWrapping: true,
+            lineWrapping: false, // Disable line wrapping to enable horizontal scrolling
+            scrollbarStyle: 'native', // Use native scrollbars
             indentUnit: 4,
             tabSize: 4,
             indentWithTabs: false,
@@ -76,6 +77,11 @@ class YzPlayground {
         if (savedCode) {
             this.codeEditor.setValue(savedCode);
         }
+        
+        // Refresh the editor to ensure proper rendering and scrollbars
+        setTimeout(() => {
+            this.codeEditor.refresh();
+        }, 100);
     }
 
     bindEvents() {
