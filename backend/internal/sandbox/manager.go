@@ -89,12 +89,11 @@ func (m *Manager) ExecuteWithTimeout(ctx context.Context, code string, timeout t
 	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	// Use a temporary sandbox for execution
-	sandbox, err := New(m.config)
+	// Use existing sandbox instance for execution
+	sandbox, err := m.GetSandbox("default")
 	if err != nil {
-		return nil, fmt.Errorf("failed to create sandbox: %w", err)
+		return nil, fmt.Errorf("failed to get sandbox: %w", err)
 	}
-	defer sandbox.Close()
 
 	// Execute code
 	result, err := sandbox.ExecuteCode(timeoutCtx, code)

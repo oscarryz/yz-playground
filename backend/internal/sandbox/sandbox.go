@@ -3,8 +3,8 @@ package sandbox
 import (
 	"context"
 	"fmt"
-	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -81,15 +81,14 @@ func (s *Sandbox) ExecuteCode(ctx context.Context, code string) (*ExecutionResul
 		return nil, fmt.Errorf("failed to write code file: %w", err)
 	}
 
-	// Create container
-	containerID, err := s.createContainer(ctx, tempDir)
+	// Copy code to existing container's workspace
+	err = s.copyCodeToContainer(ctx, tempDir)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create container: %w", err)
+		return nil, fmt.Errorf("failed to copy code to container: %w", err)
 	}
-	defer s.removeContainer(ctx, containerID)
 
-	// Execute code compilation and run
-	output, err := s.executeInContainer(ctx, containerID, tempDir)
+	// Execute code compilation and run using existing container
+	output, err := s.executeInContainer(ctx, "yz-sandbox", tempDir)
 
 	executionTime := int(time.Since(startTime).Milliseconds())
 
@@ -163,49 +162,42 @@ func (s *Sandbox) createContainer(ctx context.Context, tempDir string) (string, 
 	return resp.ID, nil
 }
 
-// executeInContainer executes the Yz code in the container
+// copyCodeToContainer copies the code file to the container's workspace
+func (s *Sandbox) copyCodeToContainer(ctx context.Context, tempDir string) error {
+	codeFile := filepath.Join(tempDir, "main.yz")
+
+	// Use podman cp to copy the file to the container
+	cmd := exec.CommandContext(ctx, "podman", "cp", codeFile, "yz-sandbox:/workspace/main.yz")
+
+	err := cmd.Run()
+	if err != nil {
+		return fmt.Errorf("failed to copy code to container: %w", err)
+	}
+
+	return nil
+}
+
+// executeInContainer executes the Yz code in the container using Podman
 func (s *Sandbox) executeInContainer(ctx context.Context, containerID, tempDir string) (string, error) {
 	// Create execution context with timeout
 	execCtx, cancel := context.WithTimeout(ctx, time.Duration(s.config.MaxExecutionTime)*time.Second)
 	defer cancel()
 
-	// Compile and run the code
-	execConfig := container.ExecOptions{
-		AttachStdout: true,
-		AttachStderr: true,
-		Cmd:          []string{"bash", "-c", "cd /workspace && yzc build && ./bin/app"},
-		User:         "yzuser",
-	}
+	// Use podman exec command directly for cleaner output
+	cmd := exec.CommandContext(execCtx, "podman", "exec", "-u", "yzuser", containerID,
+		"bash", "-c", "cd /workspace && yzc -q main.yz")
 
-	execResp, err := s.client.ContainerExecCreate(execCtx, containerID, execConfig)
+	output, err := cmd.Output()
 	if err != nil {
-		return "", fmt.Errorf("failed to create exec: %w", err)
+		if exitError, ok := err.(*exec.ExitError); ok {
+			return "", fmt.Errorf("execution failed with exit code %d: %s", exitError.ExitCode(), string(exitError.Stderr))
+		}
+		return "", fmt.Errorf("failed to execute command: %w", err)
 	}
 
-	// Attach to execution
-	attachResp, err := s.client.ContainerExecAttach(execCtx, execResp.ID, container.ExecAttachOptions{})
-	if err != nil {
-		return "", fmt.Errorf("failed to attach to exec: %w", err)
-	}
-	defer attachResp.Close()
-
-	// Read output
-	output, err := io.ReadAll(attachResp.Reader)
-	if err != nil {
-		return "", fmt.Errorf("failed to read output: %w", err)
-	}
-
-	// Check execution result
-	inspectResp, err := s.client.ContainerExecInspect(execCtx, execResp.ID)
-	if err != nil {
-		return "", fmt.Errorf("failed to inspect exec: %w", err)
-	}
-
-	if inspectResp.ExitCode != 0 {
-		return "", fmt.Errorf("execution failed with exit code %d: %s", inspectResp.ExitCode, string(output))
-	}
-
-	return strings.TrimSpace(string(output)), nil
+	// With podman, output should be clean, but let's still filter any remaining issues
+	cleanOutput := filterCompilerOutput(string(output))
+	return strings.TrimSpace(cleanOutput), nil
 }
 
 // removeContainer removes the Docker container
@@ -222,4 +214,51 @@ func (s *Sandbox) removeContainer(ctx context.Context, containerID string) {
 // Close closes the sandbox client
 func (s *Sandbox) Close() error {
 	return s.client.Close()
+}
+
+// filterCompilerOutput cleans up any remaining binary data from Docker exec
+func filterCompilerOutput(output string) string {
+	// Remove all binary data patterns aggressively
+	cleanOutput := strings.ReplaceAll(output, "\x01\x00\x00\x00\x00\x00\x00", "")
+	cleanOutput = strings.ReplaceAll(cleanOutput, "\x01\x00\x00\x00\x00\x00\x00", "")
+	cleanOutput = strings.ReplaceAll(cleanOutput, "\x1a", "")
+	cleanOutput = strings.ReplaceAll(cleanOutput, "\x00", "")
+
+	// Remove any remaining compiler messages that might slip through
+	lines := strings.Split(cleanOutput, "\n")
+	var programOutput []string
+
+	for _, line := range lines {
+		trimmedLine := strings.TrimSpace(line)
+
+		// Skip empty lines
+		if trimmedLine == "" {
+			continue
+		}
+
+		// Skip any remaining compiler build messages
+		if strings.Contains(trimmedLine, "Built:") ||
+			strings.Contains(trimmedLine, "yzc build") ||
+			strings.Contains(trimmedLine, "running generated app") ||
+			strings.Contains(trimmedLine, "Execution completed") {
+			continue
+		}
+
+		// Skip lines with only binary data or control characters
+		if len(trimmedLine) < 2 || strings.ContainsAny(trimmedLine, "\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f") {
+			continue
+		}
+
+		// Keep everything else as program output
+		programOutput = append(programOutput, line)
+	}
+
+	result := strings.Join(programOutput, "\n")
+
+	// If no program output found, return a helpful message
+	if strings.TrimSpace(result) == "" {
+		return "Program executed successfully (no output)"
+	}
+
+	return result
 }
