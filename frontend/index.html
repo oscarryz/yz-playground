@@ -7,7 +7,9 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     
     <!-- CodeMirror CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
@@ -16,100 +18,59 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/solarized.min.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <h1 class="title">Yz Playground</h1>
-                <p class="subtitle">Write, compile, and run Yz code in your browser</p>
-            </div>
-        </header>
+    <!-- Minimal Header -->
+    <header class="header">
+        <div class="logo-container">
+            <h1 class="logo">Yz</h1>
+        </div>
+        <div class="controls">
+            <button id="copy-link-btn" class="control-btn">
+                <span class="btn-icon">🔗</span>
+            </button>
+            <button id="share-btn" class="control-btn">
+                <span class="btn-icon">&lt; / &gt;</span>
+            </button>
+            <button id="settings-btn" class="control-btn">
+                <span class="btn-icon">⚙️</span>
+            </button>
+            <button id="run-btn" class="run-btn">
+                <span class="btn-icon">▶</span>
+                Run
+            </button>
+        </div>
+    </header>
 
-        <!-- Main Content -->
-        <main class="main">
-            <!-- Code Editor Section -->
-            <section class="editor-section">
-                <div class="editor-header">
-                    <h2>Editor</h2>
-                    <div class="editor-controls">
-                        <button id="run-btn" class="btn btn-primary">
-                            <span class="btn-icon">▶</span>
-                            Run
-                        </button>
-                        <button id="clear-btn" class="btn btn-secondary">
-                            <span class="btn-icon">🗑</span>
-                            Clear
-                        </button>
-                        <button id="share-btn" class="btn btn-secondary">
-                            <span class="btn-icon">🔗</span>
-                            Share
-                        </button>
-                    </div>
-                </div>
-                <div class="editor-container">
-                    <textarea id="code-editor" class="code-editor" placeholder="// Write your Yz code here
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Code Editor -->
+        <section class="editor-section">
+            <div class="editor-container">
+                <textarea id="code-editor" class="code-editor" placeholder="// Write your Yz code here
 main : {
     println(\"Hello, World!\")
 }"></textarea>
-                </div>
-                
-                <!-- Editor Options -->
-                <div class="editor-options">
-                    <div class="theme-selector">
-                        <label for="theme-select">Theme:</label>
-                        <select id="theme-select" class="theme-select">
-                            <option value="default">Default</option>
-                            <option value="material">Material</option>
-                            <option value="monokai">Monokai</option>
-                            <option value="solarized">Solarized</option>
-                        </select>
-                    </div>
-                    <div class="font-size-selector">
-                        <label for="font-size-select">Font Size:</label>
-                        <select id="font-size-select" class="font-size-select">
-                            <option value="12">12px</option>
-                            <option value="14" selected>14px</option>
-                            <option value="16">16px</option>
-                            <option value="18">18px</option>
-                        </select>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Output Section -->
-            <section class="output-section">
-                <div class="output-header">
-                    <h2>Output</h2>
-                    <div class="output-status" id="output-status">
-                        <span class="status-icon">⏳</span>
-                        <span class="status-text">Ready</span>
-                    </div>
-                </div>
-                <div class="output-container">
-                    <pre id="output-content" class="output-content"></pre>
-                </div>
-            </section>
-        </main>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="footer-content">
-                <p>Built with ❤️ for the Yz programming language</p>
-                <div class="footer-links">
-                    <a href="#" id="compiler-version">Compiler Version</a>
-                    <a href="#" id="config-link">Configuration</a>
+                <!-- Progress Bar -->
+                <div id="progress-bar" class="progress-bar hidden">
+                    <div class="progress-fill"></div>
                 </div>
             </div>
-        </footer>
-    </div>
+        </section>
 
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="loading-overlay hidden">
-        <div class="loading-spinner">
-            <div class="spinner"></div>
-            <p>Executing your code...</p>
-        </div>
-    </div>
+        <!-- Output Section -->
+        <section class="output-section" id="output-section">
+            <div class="output-header">
+                <div class="output-title">Output</div>
+                <button id="clear-output" class="close-btn">×</button>
+            </div>
+            <div class="output-container">
+                <div class="output-status" id="output-status">
+                    <span class="status-icon">⏳</span>
+                    <span class="status-text">Ready</span>
+                </div>
+                <pre id="output-content" class="output-content"></pre>
+            </div>
+        </section>
+    </main>
 
     <!-- Error Modal -->
     <div id="error-modal" class="modal hidden">
@@ -120,6 +81,105 @@ main : {
             </div>
             <div class="modal-body">
                 <pre id="error-content"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content settings-modal">
+            <div class="modal-header">
+                <h3>Settings</h3>
+                <button id="close-settings" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4>Editor Preferences</h4>
+                    <div class="setting-item">
+                        <label for="settings-theme">Theme:</label>
+                        <select id="settings-theme" class="setting-select">
+                            <option value="default">Default</option>
+                            <option value="material">Material</option>
+                            <option value="monokai">Monokai</option>
+                            <option value="solarized">Solarized</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="settings-font-size">Font Size:</label>
+                        <select id="settings-font-size" class="setting-select">
+                            <option value="12">12px</option>
+                            <option value="14">14px</option>
+                            <option value="16" selected>16px</option>
+                            <option value="18">18px</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="settings-tab-size">Tab Size:</label>
+                        <select id="settings-tab-size" class="setting-select">
+                            <option value="2">2 spaces</option>
+                            <option value="4" selected>4 spaces</option>
+                            <option value="8">8 spaces</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="settings-line-numbers">
+                            <input type="checkbox" id="settings-line-numbers" checked>
+                            Show line numbers
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label for="settings-line-wrapping">
+                            <input type="checkbox" id="settings-line-wrapping" checked>
+                            Line wrapping
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h4>Execution Settings</h4>
+                    <div class="setting-item">
+                        <label for="settings-auto-save">
+                            <input type="checkbox" id="settings-auto-save" checked>
+                            Auto-save code to browser
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label for="settings-show-whitespace">
+                            <input type="checkbox" id="settings-show-whitespace">
+                            Show whitespace characters
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h4>Keyboard Shortcuts</h4>
+                    <div class="shortcut-list">
+                        <div class="shortcut-item">
+                            <span class="shortcut-key">Ctrl/Cmd + Enter</span>
+                            <span class="shortcut-desc">Run code</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-key">Ctrl/Cmd + K</span>
+                            <span class="shortcut-desc">Clear code</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-key">Ctrl/Cmd + /</span>
+                            <span class="shortcut-desc">Toggle comment</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-key">F11</span>
+                            <span class="shortcut-desc">Toggle fullscreen</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-key">Ctrl/Cmd + F</span>
+                            <span class="shortcut-desc">Search in code</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="reset-settings" class="btn btn-secondary">Reset to Defaults</button>
+                <button id="save-settings" class="btn btn-primary">Save Settings</button>
             </div>
         </div>
     </div>

@@ -83,7 +83,7 @@ CodeMirror.defineMode("yz", function(config, parserConfig) {
     }
 
     // Handle punctuation
-    if (stream.match(/^[{}[\]();,.]/)) return "punctuation";
+    if (stream.match(/^[{}[\]();,.:]/)) return "punctuation";
 
     // Handle identifiers and keywords
     if (stream.match(stringPrefixes)) {

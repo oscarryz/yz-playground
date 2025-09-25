@@ -6,399 +6,323 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    color: #333;
+    font-family: 'Poppins', sans-serif;
+    background: #13161B;
+    color: #ffffff;
+    height: 100vh;
+    overflow: hidden;
+    font-size: 14px;
 }
 
-.container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 20px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Header */
+/* Minimal Header */
 .header {
-    padding: 40px 0;
-    text-align: center;
-}
-
-.header-content {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
-
-.title {
-    font-size: 3.5rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 10px;
-}
-
-.subtitle {
-    font-size: 1.2rem;
-    color: #666;
-    font-weight: 400;
-}
-
-/* Main Content */
-.main {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin-bottom: 30px;
-}
-
-/* Editor Section */
-.editor-section {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-}
-
-.editor-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #f0f0f0;
+    padding: 40px 30px 40px 30px;
+    background: #13161B;
+    border-bottom: 1px solid #333;
+    height: 160px;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 100;
 }
 
-.editor-header h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #333;
+.logo-container {
+    flex: 1;
+    padding-right: 40px;
 }
 
-.editor-controls {
+.logo {
+    font-family: 'Inter', sans-serif;
+    font-size: 128px;
+    font-weight: 900;
+    font-style: italic;
+    color: #ffffff;
+    margin: 0 40px 0 0;
+    letter-spacing: -0.27em;
+    line-height: 1;
+    position: relative;
+    z-index: 10;
+}
+
+.controls {
     display: flex;
-    gap: 10px;
+    align-items: center;
+    gap: 12px;
 }
 
-.btn {
+.control-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: 1px solid #333;
+    color: #ffffff;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 16px;
+}
+
+.control-btn:hover {
+    background: #333;
+    border-color: #555;
+}
+
+.control-btn .btn-icon {
+    font-size: 16px;
+}
+
+.run-btn {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 12px 20px;
+    background: #007acc;
     border: none;
-    border-radius: 12px;
-    font-size: 0.95rem;
+    color: white;
+    border-radius: 6px;
+    font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    height: 40px;
 }
 
-.btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-}
-
-.btn-secondary {
-    background: #f8f9fa;
-    color: #666;
-    border: 2px solid #e9ecef;
-}
-
-.btn-secondary:hover {
-    background: #e9ecef;
+.run-btn:hover {
+    background: #005a9e;
     transform: translateY(-1px);
 }
 
-.btn-icon {
-    font-size: 1.1rem;
+/* Main Content */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 160px);
+}
+
+/* Editor Section */
+.editor-section {
+    flex: 1;
+    background: #131415;
+    position: relative;
 }
 
 .editor-container {
-    flex: 1;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 2px solid #e9ecef;
-}
-
-.code-editor {
+    height: 100%;
     width: 100%;
-    height: 400px;
-    padding: 20px;
-    border: none;
-    outline: none;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-    font-size: 14px;
-    line-height: 1.6;
-    background: #fafbfc;
-    resize: vertical;
-    color: #333;
-}
-
-.code-editor:focus {
-    background: white;
+    position: relative;
 }
 
 /* CodeMirror Editor Styles */
 .CodeMirror {
-    height: 400px;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-    font-size: 14px;
-    line-height: 1.6;
-    border: none;
-    border-radius: 12px;
-    background: #fafbfc;
+    height: 100% !important;
+    font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
+    font-size: 16px !important;
+    line-height: 1.6 !important;
+    background: #131415 !important;
+    color: #ffffff !important;
+    border: none !important;
 }
 
-.CodeMirror:focus {
-    background: white;
+.CodeMirror-focused {
+    outline: none !important;
 }
 
 .CodeMirror-gutters {
-    background: #f8f9fa;
-    border-right: 1px solid #e9ecef;
-    border-radius: 12px 0 0 12px;
+    background: #131415 !important;
+    border-right: 1px solid #333 !important;
 }
 
 .CodeMirror-linenumber {
-    color: #6c757d;
-    padding: 0 8px;
+    color: #666 !important;
+    padding: 0 12px !important;
 }
 
 .CodeMirror-cursor {
-    border-left: 2px solid #667eea;
+    border-left: 2px solid #007acc !important;
 }
 
 .CodeMirror-selected {
-    background: rgba(102, 126, 234, 0.2);
+    background: rgba(0, 122, 204, 0.2) !important;
 }
 
 .CodeMirror-focused .CodeMirror-selected {
-    background: rgba(102, 126, 234, 0.3);
+    background: rgba(0, 122, 204, 0.3) !important;
 }
 
-/* Editor Options */
-.editor-options {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 2px solid #f0f0f0;
-    gap: 20px;
-}
-
-.theme-selector,
-.font-size-selector {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.theme-selector label,
-.font-size-selector label {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #666;
-}
-
-.theme-select,
-.font-size-select {
-    padding: 6px 12px;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    background: white;
-    font-size: 0.9rem;
-    color: #333;
-    cursor: pointer;
-    transition: border-color 0.3s ease;
-}
-
-.theme-select:focus,
-.font-size-select:focus {
-    outline: none;
-    border-color: #667eea;
-}
+/* Syntax Highlighting - Match Documentation Colors */
+.cm-keyword { color: #CF8E6D !important; } /* Orange for keywords */
+.cm-string { color: #4A9B59 !important; } /* Green for strings */
+.cm-number { color: #2AACB8 !important; } /* Cyan for numbers */
+.cm-comment { color: #7A7E85 !important; } /* Gray for comments */
+.cm-variable { color: #C77DBA !important; } /* Purple for variables */
+.cm-type { color: #4ec9b0 !important; } /* Light green for types */
+.cm-operator { color: #ffffff !important; } /* White for operators like colons */
+.cm-punctuation { color: #ffffff !important; } /* White for punctuation */
 
 /* CodeMirror Theme Overrides */
 .CodeMirror.cm-s-material {
-    background: #263238;
-    color: #eeffff;
+    background: #131415 !important;
+    color: #eeffff !important;
+}
+
+.CodeMirror.cm-s-material .CodeMirror-gutters {
+    background: #131415 !important;
 }
 
 .CodeMirror.cm-s-monokai {
-    background: #272822;
-    color: #f8f8f2;
+    background: #272822 !important;
+    color: #f8f8f2 !important;
+}
+
+.CodeMirror.cm-s-monokai .CodeMirror-gutters {
+    background: #272822 !important;
 }
 
 .CodeMirror.cm-s-solarized {
-    background: #fdf6e3;
-    color: #586e75;
+    background: #fdf6e3 !important;
+    color: #586e75 !important;
 }
 
-.CodeMirror.cm-s-solarized.CodeMirror.cm-s-solarized-dark {
-    background: #002b36;
-    color: #839496;
+.CodeMirror.cm-s-solarized .CodeMirror-gutters {
+    background: #fdf6e3 !important;
 }
 
-/* Output Section */
+/* Output Section - Command Line Style */
 .output-section {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
+    background: #0d1117;
+    border-top: 1px solid #333;
+    max-height: 300px;
+    display: none;
+    font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.output-section.visible {
+    display: block;
 }
 
 .output-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #f0f0f0;
+    padding: 12px 20px;
+    background: #161b22;
+    border-bottom: 1px solid #333;
 }
 
-.output-header h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #333;
+.output-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #8b949e;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+    background: #333;
+    color: #ffffff;
+}
+
+.output-container {
+    padding: 20px;
+    max-height: 250px;
+    overflow-y: auto;
+    background: #0d1117;
 }
 
 .output-status {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
-    background: #f8f9fa;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 500;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #58a6ff;
 }
 
 .status-icon {
-    font-size: 1rem;
-}
-
-.output-container {
-    flex: 1;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 2px solid #e9ecef;
-    background: #fafbfc;
+    font-size: 16px;
 }
 
 .output-content {
-    width: 100%;
-    height: 400px;
-    padding: 20px;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     font-size: 14px;
     line-height: 1.6;
-    background: #fafbfc;
-    color: #333;
-    overflow-y: auto;
+    color: #e6edf3;
     white-space: pre-wrap;
     word-wrap: break-word;
+    margin: 0;
 }
 
-/* Footer */
-.footer {
-    padding: 30px 0;
-    text-align: center;
+/* Terminal-like output styling */
+.output-content::before {
+    content: '$ ';
+    color: #58a6ff;
+    font-weight: bold;
 }
 
-.footer-content {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
-
-.footer-content p {
-    margin-bottom: 15px;
-    color: #666;
-    font-size: 1rem;
-}
-
-.footer-links {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-}
-
-.footer-links a {
-    color: #667eea;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
-}
-
-.footer-links a:hover {
-    color: #764ba2;
-}
-
-/* Loading Overlay */
-.loading-overlay {
-    position: fixed;
-    top: 0;
+/* Progress Bar */
+.progress-bar {
+    position: absolute;
+    bottom: 0;
     left: 0;
     width: 100%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: 100;
+    overflow: hidden;
+}
+
+.progress-fill {
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+    width: 100%;
+    background: #51A2EA;
+    animation: progress 2s ease-in-out infinite;
+    transition: background-color 0.3s ease;
 }
 
-.loading-spinner {
-    text-align: center;
-    color: white;
+@keyframes progress {
+    0% { 
+        transform: translateX(-100%); 
+        opacity: 0.6;
+    }
+    50% { 
+        opacity: 1;
+    }
+    100% { 
+        transform: translateX(400%); 
+        opacity: 0.6;
+    }
 }
 
-.spinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-top: 4px solid white;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 20px;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Modal */
+/* Modal Styles */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -406,63 +330,177 @@ body {
 }
 
 .modal-content {
-    background: white;
-    border-radius: 20px;
+    background: #161b22;
+    border-radius: 8px;
     padding: 0;
     max-width: 600px;
     width: 90%;
     max-height: 80%;
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    border: 1px solid #333;
 }
 
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 30px;
-    border-bottom: 2px solid #f0f0f0;
-    background: #f8f9fa;
+    padding: 20px 24px;
+    border-bottom: 1px solid #333;
+    background: #0d1117;
 }
 
 .modal-header h3 {
-    font-size: 1.3rem;
+    font-size: 18px;
     font-weight: 600;
-    color: #333;
-}
-
-.close-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #666;
-    padding: 5px;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.close-btn:hover {
-    background: #e9ecef;
+    color: #ffffff;
 }
 
 .modal-body {
-    padding: 30px;
+    padding: 24px;
     max-height: 400px;
     overflow-y: auto;
+    background: #161b22;
 }
 
 .modal-body pre {
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     font-size: 14px;
     line-height: 1.6;
-    color: #333;
+    color: #e6edf3;
     white-space: pre-wrap;
     word-wrap: break-word;
+}
+
+/* Settings Modal Styles */
+.settings-modal {
+    max-width: 600px;
+    width: 95%;
+}
+
+.settings-section {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #333;
+}
+
+.settings-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.settings-section h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 12px;
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 8px 0;
+}
+
+.setting-item label {
+    font-size: 14px;
+    color: #e6edf3;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.setting-select {
+    padding: 8px 12px;
+    border: 1px solid #333;
+    border-radius: 6px;
+    background: #0d1117;
+    color: #ffffff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+    min-width: 120px;
+}
+
+.setting-select:focus {
+    outline: none;
+    border-color: #007acc;
+}
+
+.setting-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #007acc;
+    cursor: pointer;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-top: 1px solid #333;
+    background: #0d1117;
+}
+
+.modal-footer .btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #333;
+    background: #161b22;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-footer .btn:hover {
+    background: #333;
+}
+
+.modal-footer .btn-primary {
+    background: #007acc;
+    border-color: #007acc;
+}
+
+.modal-footer .btn-primary:hover {
+    background: #005a9e;
+}
+
+/* Shortcut List Styles */
+.shortcut-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.shortcut-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #0d1117;
+    border-radius: 6px;
+    border: 1px solid #333;
+}
+
+.shortcut-key {
+    font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 12px;
+    background: #007acc;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 500;
+}
+
+.shortcut-desc {
+    font-size: 13px;
+    color: #e6edf3;
+    font-weight: 500;
 }
 
 /* Utility Classes */
@@ -472,48 +510,51 @@ body {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .main {
-        grid-template-columns: 1fr;
-        gap: 20px;
+    .header {
+        padding: 30px 20px 30px 20px;
+        height: 140px;
     }
     
-    .title {
-        font-size: 2.5rem;
+    .logo {
+        font-size: 64px;
+        letter-spacing: -0.27em;
     }
     
-    .editor-controls {
-        flex-wrap: wrap;
+    .controls {
         gap: 8px;
     }
     
-    .btn {
+    .control-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+    
+    .run-btn {
         padding: 10px 16px;
-        font-size: 0.9rem;
+        font-size: 13px;
+        height: 36px;
     }
     
-    .footer-links {
+    .main-content {
+        height: calc(100vh - 140px);
+    }
+    
+    .CodeMirror {
+        font-size: 14px !important;
+    }
+    
+    .settings-modal {
+        width: 98%;
+        max-height: 90vh;
+    }
+    
+    .modal-footer {
         flex-direction: column;
-        gap: 15px;
-    }
-}
-
-@media (max-width: 480px) {
-    .container {
-        padding: 0 15px;
+        gap: 8px;
     }
     
-    .header-content,
-    .editor-section,
-    .output-section,
-    .footer-content {
-        padding: 20px;
-    }
-    
-    .title {
-        font-size: 2rem;
-    }
-    
-    .subtitle {
-        font-size: 1rem;
+    .modal-footer .btn {
+        width: 100%;
     }
 }

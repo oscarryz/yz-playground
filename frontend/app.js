@@ -5,9 +5,21 @@ class YzPlayground {
         this.codeEditor = null;
         this.outputContent = document.getElementById('output-content');
         this.outputStatus = document.getElementById('output-status');
-        this.loadingOverlay = document.getElementById('loading-overlay');
+        this.progressBar = document.getElementById('progress-bar');
         this.errorModal = document.getElementById('error-modal');
         this.errorContent = document.getElementById('error-content');
+        this.settingsModal = document.getElementById('settings-modal');
+        
+        // Settings state
+        this.settings = {
+            theme: 'default',
+            fontSize: '16',
+            tabSize: '4',
+            lineNumbers: true,
+            lineWrapping: true,
+            autoSave: true,
+            showWhitespace: false
+        };
         
         this.init();
     }
@@ -69,20 +81,10 @@ class YzPlayground {
     bindEvents() {
         // Button events
         document.getElementById('run-btn').addEventListener('click', () => this.runCode());
-        document.getElementById('clear-btn').addEventListener('click', () => this.clearCode());
+        document.getElementById('copy-link-btn').addEventListener('click', () => this.copyLink());
         document.getElementById('share-btn').addEventListener('click', () => this.shareCode());
-        
-        // Theme selector
-        document.getElementById('theme-select').addEventListener('change', (e) => {
-            this.codeEditor.setOption('theme', e.target.value);
-            localStorage.setItem('yz-playground-theme', e.target.value);
-        });
-
-        // Font size selector
-        document.getElementById('font-size-select').addEventListener('change', (e) => {
-            this.codeEditor.setOption('fontSize', e.target.value + 'px');
-            localStorage.setItem('yz-playground-font-size', e.target.value);
-        });
+        document.getElementById('settings-btn').addEventListener('click', () => this.showSettings());
+        document.getElementById('clear-output').addEventListener('click', () => this.clearOutput());
         
         // Modal events
         document.getElementById('close-error').addEventListener('click', () => this.hideError());
@@ -90,20 +92,35 @@ class YzPlayground {
             if (e.target === this.errorModal) this.hideError();
         });
 
+        // Settings modal events
+        document.getElementById('close-settings').addEventListener('click', () => this.hideSettings());
+        document.getElementById('settings-modal').addEventListener('click', (e) => {
+            if (e.target === this.settingsModal) this.hideSettings();
+        });
+        document.getElementById('save-settings').addEventListener('click', () => this.saveSettings());
+        document.getElementById('reset-settings').addEventListener('click', () => this.resetSettings());
+
         // Load saved preferences
         this.loadPreferences();
     }
 
     loadPreferences() {
-        // Load theme
-        const savedTheme = localStorage.getItem('yz-playground-theme') || 'default';
-        this.codeEditor.setOption('theme', savedTheme);
-        document.getElementById('theme-select').value = savedTheme;
+        // Load complete settings from localStorage
+        const savedSettings = localStorage.getItem('yz-playground-settings');
+        if (savedSettings) {
+            try {
+                this.settings = { ...this.settings, ...JSON.parse(savedSettings) };
+            } catch (e) {
+                console.warn('Failed to parse saved settings:', e);
+            }
+        }
 
-        // Load font size
-        const savedFontSize = localStorage.getItem('yz-playground-font-size') || '14';
-        this.codeEditor.setOption('fontSize', savedFontSize + 'px');
-        document.getElementById('font-size-select').value = savedFontSize;
+        // Apply settings to editor
+        this.codeEditor.setOption('theme', this.settings.theme);
+        this.codeEditor.setOption('fontSize', this.settings.fontSize + 'px');
+        this.codeEditor.setOption('indentUnit', parseInt(this.settings.tabSize));
+        this.codeEditor.setOption('lineNumbers', this.settings.lineNumbers);
+        this.codeEditor.setOption('lineWrapping', this.settings.lineWrapping);
     }
 
     getDefaultCode() {
@@ -133,7 +150,8 @@ main : {
             return;
         }
 
-        this.showLoading();
+        this.showProgress();
+        this.showOutput();
         this.updateStatus('executing', 'Executing your code...');
 
         try {
@@ -163,15 +181,38 @@ main : {
             this.updateStatus('error', 'Connection failed');
             this.outputContent.textContent = `Network error: ${error.message}`;
         } finally {
-            this.hideLoading();
+            this.hideProgress();
         }
     }
 
     clearCode() {
         this.codeEditor.setValue('');
-        this.outputContent.textContent = '';
+        this.hideOutput();
         this.updateStatus('ready', 'Ready');
         localStorage.removeItem('yz-playground-code');
+    }
+
+    clearOutput() {
+        this.outputContent.textContent = '';
+        this.updateStatus('ready', 'Ready');
+        this.hideOutput();
+    }
+
+    copyLink() {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url).then(() => {
+            this.showSuccess('Link copied to clipboard!');
+        }).catch(() => {
+            this.showError('Failed to copy link');
+        });
+    }
+
+    showOutput() {
+        document.getElementById('output-section').classList.add('visible');
+    }
+
+    hideOutput() {
+        document.getElementById('output-section').classList.remove('visible');
     }
 
     shareCode() {
@@ -218,12 +259,12 @@ main : {
         this.outputStatus.style.color = colors[type] || '#666';
     }
 
-    showLoading() {
-        this.loadingOverlay.classList.remove('hidden');
+    showProgress() {
+        this.progressBar.classList.remove('hidden');
     }
 
-    hideLoading() {
-        this.loadingOverlay.classList.add('hidden');
+    hideProgress() {
+        this.progressBar.classList.add('hidden');
     }
 
     showError(message) {
@@ -301,6 +342,87 @@ main : {
             this.codeEditor.setValue(decodeURIComponent(code));
             localStorage.setItem('yz-playground-code', this.codeEditor.getValue());
         }
+    }
+
+    // Settings Modal Methods
+    showSettings() {
+        this.loadSettingsToModal();
+        this.settingsModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    hideSettings() {
+        this.settingsModal.classList.add('hidden');
+        document.body.style.overflow = ''; // Restore scrolling
+    }
+
+    loadSettingsToModal() {
+        // Load current settings into modal
+        document.getElementById('settings-theme').value = this.settings.theme;
+        document.getElementById('settings-font-size').value = this.settings.fontSize;
+        document.getElementById('settings-tab-size').value = this.settings.tabSize;
+        document.getElementById('settings-line-numbers').checked = this.settings.lineNumbers;
+        document.getElementById('settings-line-wrapping').checked = this.settings.lineWrapping;
+        document.getElementById('settings-auto-save').checked = this.settings.autoSave;
+        document.getElementById('settings-show-whitespace').checked = this.settings.showWhitespace;
+    }
+
+    saveSettings() {
+        // Get settings from modal
+        this.settings.theme = document.getElementById('settings-theme').value;
+        this.settings.fontSize = document.getElementById('settings-font-size').value;
+        this.settings.tabSize = document.getElementById('settings-tab-size').value;
+        this.settings.lineNumbers = document.getElementById('settings-line-numbers').checked;
+        this.settings.lineWrapping = document.getElementById('settings-line-wrapping').checked;
+        this.settings.autoSave = document.getElementById('settings-auto-save').checked;
+        this.settings.showWhitespace = document.getElementById('settings-show-whitespace').checked;
+
+        // Apply settings to editor
+        this.codeEditor.setOption('theme', this.settings.theme);
+        this.codeEditor.setOption('fontSize', this.settings.fontSize + 'px');
+        this.codeEditor.setOption('indentUnit', parseInt(this.settings.tabSize));
+        this.codeEditor.setOption('lineNumbers', this.settings.lineNumbers);
+        this.codeEditor.setOption('lineWrapping', this.settings.lineWrapping);
+
+        // Settings are applied directly to the editor
+
+        // Save to localStorage
+        localStorage.setItem('yz-playground-settings', JSON.stringify(this.settings));
+        localStorage.setItem('yz-playground-theme', this.settings.theme);
+        localStorage.setItem('yz-playground-font-size', this.settings.fontSize);
+
+        this.hideSettings();
+        this.showSuccess('Settings saved successfully!');
+    }
+
+    resetSettings() {
+        // Reset to default settings
+        this.settings = {
+            theme: 'default',
+            fontSize: '16',
+            tabSize: '4',
+            lineNumbers: true,
+            lineWrapping: true,
+            autoSave: true,
+            showWhitespace: false
+        };
+
+        // Apply default settings to editor
+        this.codeEditor.setOption('theme', 'default');
+        this.codeEditor.setOption('fontSize', '16px');
+        this.codeEditor.setOption('indentUnit', 4);
+        this.codeEditor.setOption('lineNumbers', true);
+        this.codeEditor.setOption('lineWrapping', true);
+
+        // Settings are applied directly to the editor
+
+        // Clear localStorage
+        localStorage.removeItem('yz-playground-settings');
+        localStorage.setItem('yz-playground-theme', 'default');
+        localStorage.setItem('yz-playground-font-size', '16');
+
+        this.loadSettingsToModal();
+        this.showSuccess('Settings reset to defaults!');
     }
 }
 
