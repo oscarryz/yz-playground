@@ -75,8 +75,12 @@ func (s *Sandbox) ExecuteCode(ctx context.Context, code string) (*ExecutionResul
 	}
 	defer os.RemoveAll(tempDir)
 
-	// Write code to file
+	// Write code to file (ensure it ends with a newline)
 	codeFile := filepath.Join(tempDir, "main.yz")
+	// Add newline if code doesn't end with one
+	if !strings.HasSuffix(code, "\n") {
+		code += "\n"
+	}
 	if err := os.WriteFile(codeFile, []byte(code), 0644); err != nil {
 		return nil, fmt.Errorf("failed to write code file: %w", err)
 	}
