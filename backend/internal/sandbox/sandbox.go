@@ -166,8 +166,8 @@ func (s *Sandbox) createContainer(ctx context.Context, tempDir string) (string, 
 func (s *Sandbox) copyCodeToContainer(ctx context.Context, tempDir string) error {
 	codeFile := filepath.Join(tempDir, "main.yz")
 
-	// Use podman cp to copy the file to the container
-	cmd := exec.CommandContext(ctx, "podman", "cp", codeFile, "yz-sandbox:/workspace/main.yz")
+	// Use docker cp to copy the file to the container
+	cmd := exec.CommandContext(ctx, "docker", "cp", codeFile, "yz-sandbox:/workspace/main.yz")
 
 	err := cmd.Run()
 	if err != nil {
@@ -183,9 +183,9 @@ func (s *Sandbox) executeInContainer(ctx context.Context, containerID, tempDir s
 	execCtx, cancel := context.WithTimeout(ctx, time.Duration(s.config.MaxExecutionTime)*time.Second)
 	defer cancel()
 
-	// Use podman exec command directly for cleaner output
-	cmd := exec.CommandContext(execCtx, "podman", "exec", "-u", "yzuser", containerID,
-		"bash", "-c", "cd /workspace && yzc -q main.yz")
+	// Use docker exec command directly for cleaner output
+	cmd := exec.CommandContext(execCtx, "docker", "exec", "-u", "yzuser", containerID,
+		"bash", "-c", "cd /workspace && yzc main.yz")
 
 	output, err := cmd.Output()
 	if err != nil {
@@ -195,7 +195,7 @@ func (s *Sandbox) executeInContainer(ctx context.Context, containerID, tempDir s
 		return "", fmt.Errorf("failed to execute command: %w", err)
 	}
 
-	// With podman, output should be clean, but let's still filter any remaining issues
+	// With docker, output should be clean, but let's still filter any remaining issues
 	cleanOutput := filterCompilerOutput(string(output))
 	return strings.TrimSpace(cleanOutput), nil
 }
