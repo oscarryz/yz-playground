@@ -9,7 +9,7 @@ services:
     build:
       context: ./docker/sandbox
       dockerfile: Dockerfile
-    image: yz-sandbox
+    image: localhost/yz-sandbox
     container_name: yz-sandbox
     privileged: true  # Required for isolate to work properly
     volumes:
@@ -25,6 +25,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    image: localhost/yz-backend
     container_name: yz-backend
     ports:
       - "8080:8080"
@@ -45,6 +46,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    image: localhost/yz-frontend
     container_name: yz-frontend
     ports:
       - "3000:3000"

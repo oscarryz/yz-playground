@@ -31,9 +31,10 @@ RUN git clone https://github.com/ioi/isolate.git /tmp/isolate && \
     make install && \
     rm -rf /tmp/isolate
 
-# Install Yz compiler
+# Install Yz compiler (latest version)
 RUN git clone https://github.com/oscarryz/yz.git /tmp/yz && \
     cd /tmp/yz && \
+    git pull origin main && \
     go version && \
     go mod tidy && \
     go build -o /usr/local/bin/yzc ./cmd/yzc && \
