@@ -24,14 +24,56 @@
             <h1 class="logo">Yz</h1>
         </div>
         <div class="controls">
-            <button id="copy-link-btn" class="control-btn">
+            <button id="copy-link-btn" class="control-btn" title="Copy link" aria-label="Copy link">
                 <span class="btn-icon">🔗</span>
+                <span class="btn-label">Copy link</span>
             </button>
-            <button id="share-btn" class="control-btn">
+            <button id="share-btn" class="control-btn" title="Shareable code" aria-label="Shareable code">
                 <span class="btn-icon">&lt; / &gt;</span>
+                <span class="btn-label">Shareable code</span>
             </button>
-            <button id="settings-btn" class="control-btn">
-                <span class="btn-icon">⚙️</span>
+            <button id="settings-btn" class="control-btn" title="Settings" aria-label="Settings">
+                <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" 
+                     viewBox="0 0 60 60" 
+                     width="16" 
+                     height="16" 
+                     aria-labelledby="settings-title settings-desc" 
+                     role="img">
+                    <title id="settings-title">Settings</title>
+                    <desc id="settings-desc">Two horizontal lines with circular handles: right, left.</desc>
+                    
+                    <!-- Define reusable styles -->
+                    <defs>
+                        <style type="text/css">
+                            .line {
+                                stroke: #ffffff; /* Line color - white to match button text */
+                                stroke-width: 6; /* Thicker lines to match share button style */
+                                stroke-linecap: round;
+                            }
+                            .circle {
+                                /* Hollow Circle Styles - Matches line stroke-width */
+                                fill: none; 
+                                stroke: #ffffff; /* White to match button text */
+                                stroke-width: 6; /* Thicker circles to match lines */
+                            }
+                        </style>
+                    </defs>
+
+                    <!-- All coordinates shifted by +5 to provide margin from the 0,0 edge -->
+                    
+                    <!-- Group 1: Top Line (Circle on Right) -->
+                    <g id="top-filter">
+                        <line class="line" x1="10" y1="15" x2="45" y2="15" /> 
+                        <circle class="circle" cx="50" cy="15" r="8" /> 
+                    </g>
+
+                    <!-- Group 2: Bottom Line (Circle on Left) -->
+                    <g id="bottom-filter">
+                        <line class="line" x1="15" y1="45" x2="50" y2="45" />
+                        <circle class="circle" cx="10" cy="45" r="8" />
+                    </g>
+                </svg>
+                <span class="btn-label">Settings</span>
             </button>
             <button id="run-btn" class="run-btn">
                 <span class="btn-icon">▶</span>

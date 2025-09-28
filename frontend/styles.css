@@ -56,8 +56,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
+    gap: 6px;
+    width: auto;
+    min-width: 40px;
     height: 40px;
+    padding: 0 8px;
     background: transparent;
     border: 1px solid #333;
     color: #ffffff;
@@ -74,6 +77,33 @@ body {
 
 .control-btn .btn-icon {
     font-size: 16px;
+}
+
+/* SVG icon specific styles */
+.control-btn svg.btn-icon {
+    width: 16px;
+    height: 16px;
+    display: block;
+    flex-shrink: 0;
+}
+
+/* Button label styles */
+.btn-label {
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    display: none; /* Hidden by default on small screens */
+}
+
+/* Show labels on larger screens */
+@media (min-width: 768px) {
+    .btn-label {
+        display: inline;
+    }
+    
+    .control-btn {
+        padding: 0 12px;
+    }
 }
 
 .run-btn {
