@@ -85,7 +85,7 @@ podman run -d --name yz-backend \
   -v /var/run/docker.sock:/var/run/docker.sock \
   --env SANDBOX_CONTAINER=yz-sandbox \
   --env YZ_COMPILER_PATH=/usr/local/bin/yzc \
-  docker.io/library/yz-playground-backend:latest
+  localhost/yz-backend:latest
 
 # Check if backend is running
 if ! podman ps | grep -q yz-backend; then

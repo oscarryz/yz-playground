@@ -110,7 +110,7 @@ body {
     flex: 1;
     background: #131415;
     position: relative;
-    min-height: 200px;
+    min-height: 250px;
     max-height: calc(100vh - 160px - 100px); /* Reserve space for output */
 }
 
@@ -123,7 +123,7 @@ body {
 
 /* Resizable Separator */
 .resizer {
-    height: 8px;
+    height: 6px;
     background: #333;
     cursor: row-resize;
     position: relative;
@@ -228,6 +228,7 @@ body {
     background: rgba(0, 122, 204, 0.3) !important;
 }
 
+
 /* Syntax Highlighting - Match Documentation Colors */
 .cm-keyword { color: #CF8E6D !important; } /* Orange for keywords */
 .cm-string { color: #4A9B59 !important; } /* Green for strings */
@@ -271,7 +272,7 @@ body {
     background: #0d1117;
     border-top: 1px solid #333;
     height: 50px;
-    min-height: 50px;
+    min-height: 120px;
     max-height: calc(100vh - 160px - 200px); /* Reserve space for editor */
     display: flex;
     flex-direction: column;
@@ -287,9 +288,11 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
+    padding: 0px 0px;
     background: #161b22;
     border-bottom: 1px solid #333;
+    height: 0px;
+    overflow: hidden;
 }
 
 .output-title {
@@ -297,7 +300,7 @@ body {
     font-weight: 500;
     color: #8b949e;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.0px;
 }
 
 .close-btn {
@@ -306,10 +309,10 @@ body {
     color: #8b949e;
     font-size: 16px;
     cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
+    padding: 0px;
+    border-radius: 0px;
     width: 24px;
-    height: 24px;
+    height: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
