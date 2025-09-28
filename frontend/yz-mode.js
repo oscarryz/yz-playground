@@ -108,6 +108,12 @@ CodeMirror.defineMode("yz", function(config, parserConfig) {
         state.tokenize = tokenBase;
         return "string";
       }
+      // Check for string interpolation `...` inside double quotes
+      if (!escaped && stream.match(/^`/)) {
+        state.stringType = 'double';
+        state.tokenize = tokenInterpolation;
+        return "string";
+      }
       escaped = !escaped && stream.match(/^\\/);
       stream.next();
     }
@@ -119,6 +125,12 @@ CodeMirror.defineMode("yz", function(config, parserConfig) {
     while (!stream.eol()) {
       if (!escaped && stream.match(/^'/)) {
         state.tokenize = tokenBase;
+        return "string";
+      }
+      // Check for string interpolation `...` inside single quotes
+      if (!escaped && stream.match(/^`/)) {
+        state.stringType = 'single';
+        state.tokenize = tokenInterpolation;
         return "string";
       }
       escaped = !escaped && stream.match(/^\\/);
@@ -138,6 +150,74 @@ CodeMirror.defineMode("yz", function(config, parserConfig) {
     return "string";
   }
 
+  function tokenInterpolation(stream, state) {
+    while (!stream.eol()) {
+      if (stream.match(/^`/)) {
+        // Return to the appropriate string tokenizer based on the original string type
+        if (state.stringType === 'double') {
+          state.tokenize = tokenString;
+        } else if (state.stringType === 'single') {
+          state.tokenize = tokenChar;
+        }
+        return "string";
+      }
+      
+      // Handle whitespace in interpolation
+      if (stream.eatSpace()) return null;
+      
+      // Handle comments in interpolation
+      if (stream.match(/^\/\//)) {
+        stream.skipToEnd();
+        return "comment";
+      }
+      if (stream.match(/^\/\*/)) {
+        state.tokenize = tokenComment;
+        return tokenComment(stream, state);
+      }
+      
+      // Handle strings in interpolation
+      if (stream.match(/^"/)) {
+        state.tokenize = tokenString;
+        return tokenString(stream, state);
+      }
+      if (stream.match(/^'/)) {
+        state.tokenize = tokenChar;
+        return tokenChar(stream, state);
+      }
+      
+      // Handle numbers in interpolation
+      if (stream.match(/^0[xX][0-9a-fA-F]+/)) return "number";
+      if (stream.match(/^0[0-7]+/)) return "number";
+      if (stream.match(/^0[bB][01]+/)) return "number";
+      if (stream.match(/^\d+\.\d+([eE][+-]?\d+)?/)) return "number";
+      if (stream.match(/^\d+[eE][+-]?\d+/)) return "number";
+      if (stream.match(/^\d+/)) return "number";
+      
+      // Handle operators in interpolation
+      if (stream.match(/^[+\-*/%=<>!&|^~]/)) {
+        if (stream.match(/^[+\-*/%=<>!&|^~]=/)) return "operator";
+        return "operator";
+      }
+      
+      // Handle punctuation in interpolation
+      if (stream.match(/^[{}[\]();,.:]/)) return "punctuation";
+      
+      // Handle identifiers and keywords in interpolation
+      if (stream.match(stringPrefixes)) {
+        if (keywordRegex.test(stream.current())) {
+          return "keyword";
+        }
+        if (builtinRegex.test(stream.current())) {
+          return "builtin";
+        }
+        return "variable";
+      }
+      
+      stream.next();
+    }
+    return "string";
+  }
+
   function tokenComment(stream, state) {
     while (!stream.eol()) {
       if (stream.match(/\*\//)) {
@@ -151,7 +231,7 @@ CodeMirror.defineMode("yz", function(config, parserConfig) {
 
   return {
     startState: function() {
-      return { tokenize: tokenBase };
+      return { tokenize: tokenBase, stringType: null };
     },
     token: function(stream, state) {
       if (state.tokenize) {

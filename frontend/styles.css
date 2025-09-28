@@ -238,6 +238,7 @@ body {
 .cm-type { color: #4ec9b0 !important; } /* Light green for types */
 .cm-operator { color: #ffffff !important; } /* White for operators like colons */
 .cm-punctuation { color: #ffffff !important; } /* White for punctuation */
+.cm-builtin { color: #FFD700 !important; } /* Gold for built-in functions */
 
 /* CodeMirror Theme Overrides */
 .CodeMirror.cm-s-material {
