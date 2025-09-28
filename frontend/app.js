@@ -287,9 +287,13 @@ main : {
     copyLink() {
         const url = window.location.href;
         navigator.clipboard.writeText(url).then(() => {
-            this.showSuccess('Link copied to clipboard!');
+            this.showOutput();
+            this.updateStatus('success', 'Link copied to clipboard!');
+            this.outputContent.textContent = url;
         }).catch(() => {
-            this.showError('Failed to copy link');
+            this.showOutput();
+            this.updateStatus('error', 'Failed to copy link');
+            this.outputContent.textContent = 'Unable to copy link to clipboard. Please copy manually: ' + url;
         });
     }
 
@@ -319,10 +323,13 @@ main : {
         
         // Copy to clipboard
         navigator.clipboard.writeText(url).then(() => {
-            this.showSuccess('Shareable link copied to clipboard!');
+            this.showOutput();
+            this.updateStatus('success', 'Shareable link copied to clipboard!');
+            this.outputContent.textContent = url;
         }).catch(() => {
-            // Fallback: show the URL in a prompt
-            prompt('Share this link:', url);
+            this.showOutput();
+            this.updateStatus('error', 'Failed to copy shareable link');
+            this.outputContent.textContent = 'Unable to copy link to clipboard. Please copy manually:\n\n' + url;
         });
     }
 
