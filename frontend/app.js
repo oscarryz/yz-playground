@@ -10,6 +10,11 @@ class YzPlayground {
         this.errorContent = document.getElementById('error-content');
         this.settingsModal = document.getElementById('settings-modal');
         
+        // Resizer elements
+        this.resizer = document.getElementById('resizer');
+        this.editorSection = document.getElementById('editor-section');
+        this.outputSection = document.getElementById('output-section');
+        
         // Settings state
         this.settings = {
             theme: 'default',
@@ -27,6 +32,7 @@ class YzPlayground {
     init() {
         this.initializeCodeMirror();
         this.bindEvents();
+        this.initializeResizer();
         this.loadDefaultCode();
         this.updateCompilerVersion();
         this.updateConfig();
@@ -108,6 +114,79 @@ class YzPlayground {
 
         // Load saved preferences
         this.loadPreferences();
+    }
+
+    initializeResizer() {
+        let isResizing = false;
+        let startY = 0;
+        let startEditorHeight = 0;
+        let startOutputHeight = 0;
+
+        // Add event listener to the resizer
+        this.resizer.addEventListener('mousedown', (e) => {
+            console.log('Resizer mousedown event triggered'); // Debug log
+            isResizing = true;
+            startY = e.clientY;
+            startEditorHeight = this.editorSection.offsetHeight;
+            startOutputHeight = this.outputSection.offsetHeight;
+            
+            this.resizer.classList.add('active');
+            document.body.style.cursor = 'row-resize';
+            document.body.style.userSelect = 'none';
+            
+            e.preventDefault();
+            e.stopPropagation();
+        });
+
+        // Use document-level event listeners for mouse move and up
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            
+            const deltaY = e.clientY - startY;
+            const newEditorHeight = startEditorHeight + deltaY;
+            const newOutputHeight = startOutputHeight - deltaY;
+            
+            // Set minimum heights
+            const minEditorHeight = 200;
+            const minOutputHeight = 100;
+            const maxEditorHeight = window.innerHeight - 160 - minOutputHeight;
+            const maxOutputHeight = window.innerHeight - 160 - minEditorHeight;
+            
+            if (newEditorHeight >= minEditorHeight && 
+                newEditorHeight <= maxEditorHeight &&
+                newOutputHeight >= minOutputHeight && 
+                newOutputHeight <= maxOutputHeight) {
+                
+                this.editorSection.style.height = newEditorHeight + 'px';
+                this.outputSection.style.height = newOutputHeight + 'px';
+                
+                // Refresh CodeMirror to adjust to new height
+                if (this.codeEditor) {
+                    this.codeEditor.refresh();
+                }
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isResizing) {
+                console.log('Resizer mouseup event triggered'); // Debug log
+                isResizing = false;
+                this.resizer.classList.remove('active');
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            }
+        });
+
+        // Add hover effect for better UX
+        this.resizer.addEventListener('mouseenter', () => {
+            this.resizer.style.background = '#555';
+        });
+
+        this.resizer.addEventListener('mouseleave', () => {
+            if (!isResizing) {
+                this.resizer.style.background = '#333';
+            }
+        });
     }
 
     loadPreferences() {
@@ -201,7 +280,8 @@ main : {
     clearOutput() {
         this.outputContent.textContent = '';
         this.updateStatus('ready', 'Ready');
-        this.hideOutput();
+        const outputSection = document.getElementById('output-section');
+        outputSection.classList.remove('has-content');
     }
 
     copyLink() {
@@ -214,11 +294,15 @@ main : {
     }
 
     showOutput() {
-        document.getElementById('output-section').classList.add('visible');
+        const outputSection = document.getElementById('output-section');
+        outputSection.classList.remove('hidden');
+        outputSection.classList.add('has-content');
     }
 
     hideOutput() {
-        document.getElementById('output-section').classList.remove('visible');
+        const outputSection = document.getElementById('output-section');
+        outputSection.classList.add('hidden');
+        outputSection.classList.remove('has-content');
     }
 
     shareCode() {

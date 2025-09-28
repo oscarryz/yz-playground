@@ -110,6 +110,8 @@ body {
     flex: 1;
     background: #131415;
     position: relative;
+    min-height: 200px;
+    max-height: calc(100vh - 160px - 100px); /* Reserve space for output */
 }
 
 .editor-container {
@@ -117,6 +119,40 @@ body {
     width: 100%;
     position: relative;
     overflow: hidden; /* Let CodeMirror handle its own scrolling */
+}
+
+/* Resizable Separator */
+.resizer {
+    height: 8px;
+    background: #333;
+    cursor: row-resize;
+    position: relative;
+    transition: background-color 0.2s ease;
+    display: block;
+    border-top: 1px solid #555;
+    border-bottom: 1px solid #555;
+}
+
+.resizer:hover {
+    background: #555;
+}
+
+.resizer.active {
+    background: #007acc;
+}
+
+/* Visual indicator for resizer - removed ⋮⋮ symbols */
+
+/* Make the entire resizer area clickable */
+.resizer::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 0;
+    right: 0;
+    height: 16px;
+    background: transparent;
+    cursor: row-resize;
 }
 
 /* CodeMirror Editor Styles */
@@ -234,13 +270,17 @@ body {
 .output-section {
     background: #0d1117;
     border-top: 1px solid #333;
-    max-height: 300px;
-    display: none;
+    height: 50px;
+    min-height: 50px;
+    max-height: calc(100vh - 160px - 200px); /* Reserve space for editor */
+    display: flex;
+    flex-direction: column;
     font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    flex-shrink: 0;
 }
 
-.output-section.visible {
-    display: block;
+.output-section.hidden {
+    display: none;
 }
 
 .output-header {
@@ -283,9 +323,15 @@ body {
 
 .output-container {
     padding: 20px;
-    max-height: 250px;
+    flex: 1;
     overflow-y: auto;
     background: #0d1117;
+    min-height: 0; /* Allow flex item to shrink */
+    display: none; /* Hide content initially */
+}
+
+.output-section.has-content .output-container {
+    display: block; /* Show content when there's output */
 }
 
 .output-status {
