@@ -85,6 +85,11 @@ func (m *Manager) GetStats() map[string]interface{} {
 
 // ExecuteWithTimeout executes code with a timeout
 func (m *Manager) ExecuteWithTimeout(ctx context.Context, code string, timeout time.Duration) (*ExecutionResult, error) {
+	return m.ExecuteWithOptions(ctx, code, timeout, false)
+}
+
+// ExecuteWithOptions executes code with additional options
+func (m *Manager) ExecuteWithOptions(ctx context.Context, code string, timeout time.Duration, showGeneratedCode bool) (*ExecutionResult, error) {
 	// Create context with timeout
 	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
@@ -96,7 +101,7 @@ func (m *Manager) ExecuteWithTimeout(ctx context.Context, code string, timeout t
 	}
 
 	// Execute code
-	result, err := sandbox.ExecuteCode(timeoutCtx, code)
+	result, err := sandbox.ExecuteCodeWithOptions(timeoutCtx, code, showGeneratedCode)
 	if err != nil {
 		return nil, fmt.Errorf("execution failed: %w", err)
 	}

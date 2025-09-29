@@ -96,7 +96,7 @@ func main() {
 
 		// Execute code in sandbox
 		timeout := time.Duration(cfg.MaxExecutionTime) * time.Millisecond
-		result, err := sandboxManager.ExecuteWithTimeout(c.Request.Context(), req.Code, timeout)
+		result, err := sandboxManager.ExecuteWithOptions(c.Request.Context(), req.Code, timeout, req.ShowGeneratedCode)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -105,6 +105,7 @@ func main() {
 		c.JSON(http.StatusOK, api.ExecuteResponse{
 			Success:       result.Success,
 			Output:        result.Output,
+			GeneratedCode: result.GeneratedCode,
 			Error:         result.Error,
 			ExecutionTime: result.ExecutionTime,
 			MemoryUsed:    int(result.MemoryUsed / 1024 / 1024), // Convert bytes to MB

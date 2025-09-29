@@ -2,15 +2,17 @@ package api
 
 // ExecuteRequest represents a code execution request
 type ExecuteRequest struct {
-	Code    string `json:"code" binding:"required"`
-	Timeout int    `json:"timeout,omitempty"`
-	Memory  int    `json:"memory,omitempty"`
+	Code              string `json:"code" binding:"required"`
+	Timeout           int    `json:"timeout,omitempty"`
+	Memory            int    `json:"memory,omitempty"`
+	ShowGeneratedCode bool   `json:"show_generated_code,omitempty"`
 }
 
 // ExecuteResponse represents a code execution response
 type ExecuteResponse struct {
 	Success       bool   `json:"success"`
 	Output        string `json:"output"`
+	GeneratedCode string `json:"generated_code,omitempty"`
 	Error         string `json:"error"`
 	ExecutionTime int    `json:"execution_time"`
 	MemoryUsed    int    `json:"memory_used"`

@@ -37,6 +37,7 @@ type SandboxConfig struct {
 type ExecutionResult struct {
 	Success       bool
 	Output        string
+	GeneratedCode string
 	Error         string
 	ExecutionTime int
 	MemoryUsed    int64
@@ -66,6 +67,11 @@ func New(config *SandboxConfig) (*Sandbox, error) {
 
 // ExecuteCode executes Yz code in the sandbox
 func (s *Sandbox) ExecuteCode(ctx context.Context, code string) (*ExecutionResult, error) {
+	return s.ExecuteCodeWithOptions(ctx, code, false)
+}
+
+// ExecuteCodeWithOptions executes Yz code in the sandbox with additional options
+func (s *Sandbox) ExecuteCodeWithOptions(ctx context.Context, code string, showGeneratedCode bool) (*ExecutionResult, error) {
 	startTime := time.Now()
 
 	// Create temporary directory for execution
@@ -92,13 +98,14 @@ func (s *Sandbox) ExecuteCode(ctx context.Context, code string) (*ExecutionResul
 	}
 
 	// Execute code compilation and run using existing container
-	output, err := s.executeInContainer(ctx, "yz-sandbox", tempDir)
+	output, generatedCode, err := s.executeInContainerWithOptions(ctx, "yz-sandbox", tempDir, showGeneratedCode)
 
 	executionTime := int(time.Since(startTime).Milliseconds())
 
 	result := &ExecutionResult{
 		Success:       err == nil,
 		Output:        output,
+		GeneratedCode: generatedCode,
 		ExecutionTime: executionTime,
 	}
 
@@ -109,9 +116,21 @@ func (s *Sandbox) ExecuteCode(ctx context.Context, code string) (*ExecutionResul
 	return result, nil
 }
 
-// GetCompilerVersion returns the Yz compiler version
+// GetCompilerVersion returns the Yz compiler version by executing the command inside the Docker container
 func (s *Sandbox) GetCompilerVersion(ctx context.Context) (string, error) {
-	return s.compiler.GetVersion(ctx)
+	// Execute yzc --version command inside the Docker container
+	cmd := exec.CommandContext(ctx, "docker", "exec", "-u", "yzuser", "yz-sandbox",
+		"bash", "-c", "yzc --version")
+
+	output, err := cmd.Output()
+	if err != nil {
+		if exitError, ok := err.(*exec.ExitError); ok {
+			return "", fmt.Errorf("failed to get compiler version (exit code %d): %s", exitError.ExitCode(), string(exitError.Stderr))
+		}
+		return "", fmt.Errorf("failed to execute version command: %w", err)
+	}
+
+	return strings.TrimSpace(string(output)), nil
 }
 
 // ValidateCompiler validates that the compiler is working
@@ -181,27 +200,42 @@ func (s *Sandbox) copyCodeToContainer(ctx context.Context, tempDir string) error
 	return nil
 }
 
-// executeInContainer executes the Yz code in the container using Podman
+// executeInContainer executes the Yz code in the container
 func (s *Sandbox) executeInContainer(ctx context.Context, containerID, tempDir string) (string, error) {
+	output, _, err := s.executeInContainerWithOptions(ctx, containerID, tempDir, false)
+	return output, err
+}
+
+// executeInContainerWithOptions executes the Yz code in the container with additional options
+func (s *Sandbox) executeInContainerWithOptions(ctx context.Context, containerID, tempDir string, showGeneratedCode bool) (string, string, error) {
 	// Create execution context with timeout
 	execCtx, cancel := context.WithTimeout(ctx, time.Duration(s.config.MaxExecutionTime)*time.Second)
 	defer cancel()
 
-	// Use docker exec command directly for cleaner output
+	// Build the command based on whether we want to show generated code
+	var command string
+	if showGeneratedCode {
+		command = "cd /workspace && yzc -e main.yz"
+	} else {
+		command = "cd /workspace && yzc main.yz"
+	}
+
+	// Use docker exec command directly
 	cmd := exec.CommandContext(execCtx, "docker", "exec", "-u", "yzuser", containerID,
-		"bash", "-c", "cd /workspace && yzc main.yz")
+		"bash", "-c", command)
 
 	output, err := cmd.Output()
 	if err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
-			return "", fmt.Errorf("execution failed with exit code %d: %s", exitError.ExitCode(), string(exitError.Stderr))
+			return "", "", fmt.Errorf("execution failed with exit code %d: %s", exitError.ExitCode(), string(exitError.Stderr))
 		}
-		return "", fmt.Errorf("failed to execute command: %w", err)
+		return "", "", fmt.Errorf("failed to execute command: %w", err)
 	}
 
-	// With docker, output should be clean, but let's still filter any remaining issues
-	cleanOutput := filterCompilerOutput(string(output))
-	return strings.TrimSpace(cleanOutput), nil
+	// Parse output to separate program output from generated code
+	programOutput, generatedCode := parseCompilerOutput(string(output), showGeneratedCode)
+
+	return strings.TrimSpace(programOutput), strings.TrimSpace(generatedCode), nil
 }
 
 // removeContainer removes the Docker container
@@ -220,17 +254,18 @@ func (s *Sandbox) Close() error {
 	return s.client.Close()
 }
 
-// filterCompilerOutput cleans up any remaining binary data from Docker exec
-func filterCompilerOutput(output string) string {
+// parseCompilerOutput parses the compiler output to separate program output from generated code
+func parseCompilerOutput(output string, showGeneratedCode bool) (string, string) {
 	// Remove all binary data patterns aggressively
 	cleanOutput := strings.ReplaceAll(output, "\x01\x00\x00\x00\x00\x00\x00", "")
 	cleanOutput = strings.ReplaceAll(cleanOutput, "\x01\x00\x00\x00\x00\x00\x00", "")
 	cleanOutput = strings.ReplaceAll(cleanOutput, "\x1a", "")
 	cleanOutput = strings.ReplaceAll(cleanOutput, "\x00", "")
 
-	// Remove any remaining compiler messages that might slip through
 	lines := strings.Split(cleanOutput, "\n")
 	var programOutput []string
+	var generatedCode []string
+	var inGeneratedCodeSection bool
 
 	for _, line := range lines {
 		trimmedLine := strings.TrimSpace(line)
@@ -240,7 +275,19 @@ func filterCompilerOutput(output string) string {
 			continue
 		}
 
-		// Skip any remaining compiler build messages
+		// Check if we're entering the generated code section
+		if showGeneratedCode && strings.Contains(trimmedLine, "=== Generated Go Code ===") {
+			inGeneratedCodeSection = true
+			continue
+		}
+
+		// Check if we're exiting the generated code section
+		if inGeneratedCodeSection && strings.Contains(trimmedLine, "=== End Generated Code ===") {
+			inGeneratedCodeSection = false
+			continue
+		}
+
+		// Skip compiler build messages
 		if strings.Contains(trimmedLine, "Built:") ||
 			strings.Contains(trimmedLine, "yzc build") ||
 			strings.Contains(trimmedLine, "running generated app") ||
@@ -253,16 +300,27 @@ func filterCompilerOutput(output string) string {
 			continue
 		}
 
-		// Keep everything else as program output
-		programOutput = append(programOutput, line)
+		// Categorize the line
+		if inGeneratedCodeSection {
+			generatedCode = append(generatedCode, line)
+		} else {
+			programOutput = append(programOutput, line)
+		}
 	}
 
-	result := strings.Join(programOutput, "\n")
+	programResult := strings.Join(programOutput, "\n")
+	generatedResult := strings.Join(generatedCode, "\n")
 
 	// If no program output found, return a helpful message
-	if strings.TrimSpace(result) == "" {
-		return "Program executed successfully (no output)"
+	if strings.TrimSpace(programResult) == "" {
+		programResult = "Program executed successfully (no output)"
 	}
 
-	return result
+	return programResult, generatedResult
+}
+
+// filterCompilerOutput cleans up any remaining binary data from Docker exec
+func filterCompilerOutput(output string) string {
+	programOutput, _ := parseCompilerOutput(output, false)
+	return programOutput
 }

@@ -23,7 +23,8 @@ class YzPlayground {
             lineNumbers: true,
             lineWrapping: true,
             autoSave: true,
-            showWhitespace: false
+            showWhitespace: false,
+            showGeneratedCode: false
         };
         
         this.init();
@@ -245,7 +246,10 @@ main : {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ code })
+                body: JSON.stringify({ 
+                    code,
+                    show_generated_code: this.settings.showGeneratedCode
+                })
             });
 
             const result = await response.json();
@@ -253,7 +257,14 @@ main : {
             if (response.ok) {
                 if (result.success) {
                     this.updateStatus('success', 'Execution completed');
-                    this.outputContent.textContent = result.output || '(No output)';
+                    let output = result.output || '(No output)';
+                    
+                    // If generated code is available and setting is enabled, append it
+                    if (result.generated_code && this.settings.showGeneratedCode) {
+                        output += '\n\n=== Generated Go Code ===\n' + result.generated_code + '\n=== End Generated Code ===';
+                    }
+                    
+                    this.outputContent.textContent = output;
                 } else {
                     this.updateStatus('error', 'Execution failed');
                     this.outputContent.textContent = result.error || 'Unknown error occurred';
@@ -462,6 +473,7 @@ main : {
         document.getElementById('settings-line-wrapping').checked = this.settings.lineWrapping;
         document.getElementById('settings-auto-save').checked = this.settings.autoSave;
         document.getElementById('settings-show-whitespace').checked = this.settings.showWhitespace;
+        document.getElementById('settings-show-generated-code').checked = this.settings.showGeneratedCode;
     }
 
     saveSettings() {
@@ -473,6 +485,7 @@ main : {
         this.settings.lineWrapping = document.getElementById('settings-line-wrapping').checked;
         this.settings.autoSave = document.getElementById('settings-auto-save').checked;
         this.settings.showWhitespace = document.getElementById('settings-show-whitespace').checked;
+        this.settings.showGeneratedCode = document.getElementById('settings-show-generated-code').checked;
 
         // Apply settings to editor
         this.codeEditor.setOption('theme', this.settings.theme);
@@ -501,7 +514,8 @@ main : {
             lineNumbers: true,
             lineWrapping: true,
             autoSave: true,
-            showWhitespace: false
+            showWhitespace: false,
+            showGeneratedCode: false
         };
 
         // Apply default settings to editor
