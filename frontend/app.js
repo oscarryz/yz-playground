@@ -502,7 +502,9 @@ main : {
         localStorage.setItem('yz-playground-font-size', this.settings.fontSize);
 
         this.hideSettings();
-        this.showSuccess('Settings saved successfully!');
+        this.showOutput();
+        this.updateStatus('success', 'Settings saved successfully!');
+        this.outputContent.textContent = 'Settings have been saved and applied to the editor.';
     }
 
     resetSettings() {
@@ -533,7 +535,9 @@ main : {
         localStorage.setItem('yz-playground-font-size', '16');
 
         this.loadSettingsToModal();
-        this.showSuccess('Settings reset to defaults!');
+        this.showOutput();
+        this.updateStatus('success', 'Settings reset to defaults!');
+        this.outputContent.textContent = 'Settings have been reset to their default values and applied to the editor.';
     }
 }
 
