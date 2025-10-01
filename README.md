@@ -1,7 +1,7 @@
 # Yz Programming Language Playground
 
 A secure, web-based playground for the Yz programming language that allows users to write, compile, and execute code in a sandboxed environment.
-
+![playground.png](playground.png)
 ## Features
 
 - **Secure Code Execution**: Uses isolate for safe sandboxing of untrusted code
