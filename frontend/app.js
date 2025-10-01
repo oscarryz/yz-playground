@@ -35,7 +35,6 @@ class YzPlayground {
         this.bindEvents();
         this.initializeResizer();
         this.loadDefaultCode();
-        this.updateCompilerVersion();
         this.updateConfig();
     }
 
@@ -407,18 +406,6 @@ main : {
         }, 3000);
     }
 
-    async updateCompilerVersion() {
-        try {
-            const response = await fetch(`${this.apiBase}/compiler/version`);
-            const data = await response.json();
-            
-            if (response.ok) {
-                document.getElementById('compiler-version').textContent = `Compiler: ${data.version}`;
-            }
-        } catch (error) {
-            document.getElementById('compiler-version').textContent = 'Compiler: Unknown';
-        }
-    }
 
     async updateConfig() {
         try {

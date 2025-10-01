@@ -37,7 +37,8 @@ RUN git clone https://github.com/oscarryz/yz.git /tmp/yz && \
     git pull origin main && \
     go version && \
     go mod tidy && \
-    go build -o /usr/local/bin/yzc ./cmd/yzc && \
+    make build && \
+    cp bin/yzc /usr/local/bin/yzc && \
     chmod +x /usr/local/bin/yzc && \
     rm -rf /tmp/yz
 

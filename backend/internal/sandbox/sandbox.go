@@ -1,6 +1,8 @@
 package sandbox
 
 import (
+	"archive/tar"
+	"bytes"
 	"context"
 	"fmt"
 	"os"
@@ -189,10 +191,39 @@ func (s *Sandbox) createContainer(ctx context.Context, tempDir string) (string, 
 func (s *Sandbox) copyCodeToContainer(ctx context.Context, tempDir string) error {
 	codeFile := filepath.Join(tempDir, "main.yz")
 
-	// Use docker cp to copy the file to the container
-	cmd := exec.CommandContext(ctx, "docker", "cp", codeFile, "yz-sandbox:/workspace/main.yz")
+	// Read the code file
+	codeData, err := os.ReadFile(codeFile)
+	if err != nil {
+		return fmt.Errorf("failed to read code file: %w", err)
+	}
 
-	err := cmd.Run()
+	// Create a tar archive with the code file
+	var buf bytes.Buffer
+	tw := tar.NewWriter(&buf)
+
+	// Create tar header
+	header := &tar.Header{
+		Name: "main.yz",
+		Size: int64(len(codeData)),
+		Mode: 0644,
+	}
+
+	if err := tw.WriteHeader(header); err != nil {
+		return fmt.Errorf("failed to write tar header: %w", err)
+	}
+
+	if _, err := tw.Write(codeData); err != nil {
+		return fmt.Errorf("failed to write code to tar: %w", err)
+	}
+
+	if err := tw.Close(); err != nil {
+		return fmt.Errorf("failed to close tar writer: %w", err)
+	}
+
+	// Copy the tar archive to the container
+	err = s.client.CopyToContainer(ctx, "yz-sandbox", "/workspace", &buf, container.CopyToContainerOptions{
+		AllowOverwriteDirWithFile: true,
+	})
 	if err != nil {
 		return fmt.Errorf("failed to copy code to container: %w", err)
 	}
