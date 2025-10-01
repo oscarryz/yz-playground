@@ -1,6 +1,6 @@
 # Yz Programming Language Playground
 
-A secure, web-based playground for the Yz programming language that allows users to write, compile, and execute code in a sandboxed environment.
+A secure, web-based playground for the [Yz programming](https://github.com/oscarryz/yz-docs) language that allows users to write, compile, and execute code in a sandboxed environment.
 ![playground.png](playground.png)
 ## Features
 
@@ -120,8 +120,7 @@ GET /api/health
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
+## Yz
 
-- [Isolate](https://github.com/ioi/isolate) for secure sandboxing
-- [V Playground](https://github.com/vlang/playground) for inspiration
-- [Kotlin Playground](https://play.kotlinlang.org/) for UI/UX inspiration
+- [Yz Compiler](https://github.com/oscarryz/yz) - The Yz programming language compiler/transpiler (yzc)
+- [Yz Documentation](https://github.com/oscarryz/yz-docs) - Language design, examples, and features documentation
