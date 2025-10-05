@@ -85,6 +85,9 @@ CodeMirror.defineMode("yz", function(config, parserConfig) {
     // Handle punctuation
     if (stream.match(/^[{}[\]();,.:]/)) return "punctuation";
 
+    // Handle hash symbol (used for function definitions in YZ)
+    if (stream.match(/^#/)) return "operator";
+
     // Handle identifiers and keywords
     if (stream.match(stringPrefixes)) {
       if (keywordRegex.test(stream.current())) {
@@ -201,6 +204,9 @@ CodeMirror.defineMode("yz", function(config, parserConfig) {
       
       // Handle punctuation in interpolation
       if (stream.match(/^[{}[\]();,.:]/)) return "punctuation";
+      
+      // Handle hash symbol in interpolation (used for function definitions in YZ)
+      if (stream.match(/^#/)) return "operator";
       
       // Handle identifiers and keywords in interpolation
       if (stream.match(stringPrefixes)) {
