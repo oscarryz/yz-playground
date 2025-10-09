@@ -1,7 +1,11 @@
 # Yz Programming Language Playground
 
-A secure, web-based playground for the [Yz programming](https://github.com/oscarryz/yz-docs) language that allows users to write, compile, and execute code in a sandboxed environment.
+> **Note**: [Yz compiler](https://github.com/oscarryz/yz) is work in progress and so is this playground
+
+
+A secure, web-based playground for the [Yz programming](https://github.com/oscarryz/yz-docs) language compiler that allows users to write, compile, and execute code in a sandboxed environment.
 ![playground.png](playground.png)
+
 ## Features
 
 - **Secure Code Execution**: Uses isolate for safe sandboxing of untrusted code
