@@ -124,10 +124,14 @@ func (s *Sandbox) GetCompilerVersion(ctx context.Context) (string, error) {
 	cmd := exec.CommandContext(ctx, "docker", "exec", "-u", "yzuser", "yz-sandbox",
 		"bash", "-c", "yzc --version")
 
-	output, err := cmd.Output()
+	output, err := cmd.CombinedOutput()
 	if err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
-			return "", fmt.Errorf("failed to get compiler version (exit code %d): %s", exitError.ExitCode(), string(exitError.Stderr))
+			errorOutput := string(output)
+			if errorOutput == "" {
+				errorOutput = string(exitError.Stderr)
+			}
+			return "", fmt.Errorf("failed to get compiler version (exit code %d): %s", exitError.ExitCode(), errorOutput)
 		}
 		return "", fmt.Errorf("failed to execute version command: %w", err)
 	}
@@ -255,10 +259,16 @@ func (s *Sandbox) executeInContainerWithOptions(ctx context.Context, containerID
 	cmd := exec.CommandContext(execCtx, "docker", "exec", "-u", "yzuser", containerID,
 		"bash", "-c", command)
 
-	output, err := cmd.Output()
+	// Use CombinedOutput to capture both stdout and stderr
+	output, err := cmd.CombinedOutput()
 	if err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
-			return "", "", fmt.Errorf("execution failed with exit code %d: %s", exitError.ExitCode(), string(exitError.Stderr))
+			// Return the full combined output which includes compilation errors
+			errorOutput := string(output)
+			if errorOutput == "" {
+				errorOutput = string(exitError.Stderr)
+			}
+			return "", "", fmt.Errorf("execution failed with exit code %d:\n%s", exitError.ExitCode(), errorOutput)
 		}
 		return "", "", fmt.Errorf("failed to execute command: %w", err)
 	}
