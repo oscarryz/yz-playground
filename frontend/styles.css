@@ -26,6 +26,13 @@ body {
     box-sizing: border-box;
     position: relative;
     z-index: 100;
+    transition: all 0.3s ease;
+}
+
+/* Compact header when editor is focused */
+.header.compact {
+    height: 80px;
+    padding: 15px 30px 15px 30px;
 }
 
 .logo-container {
@@ -44,6 +51,12 @@ body {
     line-height: 1;
     position: relative;
     z-index: 10;
+    transition: font-size 0.3s ease;
+}
+
+/* Smaller logo when header is compact */
+.header.compact .logo {
+    font-size: 48px;
 }
 
 .controls {
@@ -134,6 +147,12 @@ body {
     display: flex;
     flex-direction: column;
     height: calc(100vh - 160px);
+    transition: height 0.3s ease;
+}
+
+/* More space when header is compact */
+.header.compact ~ .main-content {
+    height: calc(100vh - 80px);
 }
 
 /* Editor Section */
@@ -141,8 +160,13 @@ body {
     flex: 1;
     background: #131415;
     position: relative;
-    min-height: 250px;
-    max-height: calc(100vh - 160px - 100px); /* Reserve space for output */
+    min-height: 200px;
+    max-height: calc(100vh - 160px - 30px); /* Reserve minimal space for output */
+}
+
+/* More editor space when header is compact */
+.header.compact ~ .main-content .editor-section {
+    max-height: calc(100vh - 80px - 30px);
 }
 
 .editor-container {
@@ -162,6 +186,7 @@ body {
     display: block;
     border-top: 1px solid #555;
     border-bottom: 1px solid #555;
+    z-index: 10;
 }
 
 .resizer:hover {
@@ -171,6 +196,7 @@ body {
 .resizer.active {
     background: #007acc;
 }
+
 
 /* Visual indicator for resizer - removed ⋮⋮ symbols */
 
@@ -218,6 +244,15 @@ body {
 
 .CodeMirror-selected {
     background: rgba(0, 122, 204, 0.2) !important;
+}
+
+/* Active line highlight - subtle dark background */
+.CodeMirror-activeline-background {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.CodeMirror-activeline-gutter {
+    background: rgba(255, 255, 255, 0.08) !important;
 }
 
 /* Custom Scrollbar for CodeMirror */
@@ -303,13 +338,19 @@ body {
 .output-section {
     background: #0d1117;
     border-top: 1px solid #333;
-    height: 50px;
-    min-height: 120px;
+    height: 30px;
+    min-height: 30px;
     max-height: calc(100vh - 160px - 200px); /* Reserve space for editor */
     display: flex;
     flex-direction: column;
     font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     flex-shrink: 0;
+    transition: height 0.3s ease;
+}
+
+/* Expanded state when there's content */
+.output-section.has-content {
+    height: 300px;
 }
 
 .output-section.hidden {
@@ -359,10 +400,13 @@ body {
     background: #0d1117;
     min-height: 0; /* Allow flex item to shrink */
     display: none; /* Hide content initially */
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .output-section.has-content .output-container {
     display: block; /* Show content when there's output */
+    opacity: 1;
 }
 
 .output-status {
@@ -629,9 +673,18 @@ body {
         height: 140px;
     }
     
+    .header.compact {
+        height: 70px;
+        padding: 12px 20px 12px 20px;
+    }
+    
     .logo {
         font-size: 64px;
         letter-spacing: -0.27em;
+    }
+    
+    .header.compact .logo {
+        font-size: 32px;
     }
     
     .controls {
@@ -652,6 +705,10 @@ body {
     
     .main-content {
         height: calc(100vh - 140px);
+    }
+    
+    .header.compact ~ .main-content {
+        height: calc(100vh - 70px);
     }
     
     .CodeMirror {

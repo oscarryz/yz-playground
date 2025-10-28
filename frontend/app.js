@@ -34,8 +34,10 @@ class YzPlayground {
         this.initializeCodeMirror();
         this.bindEvents();
         this.initializeResizer();
+        this.initializeOutputSection();
         this.loadDefaultCode();
         this.updateConfig();
+        this.bindFocusEvents();
     }
 
     initializeCodeMirror() {
@@ -146,9 +148,9 @@ class YzPlayground {
             const newEditorHeight = startEditorHeight + deltaY;
             const newOutputHeight = startOutputHeight - deltaY;
             
-            // Set minimum heights
+            // Set minimum heights - allow output to be minimized to 10px
             const minEditorHeight = 200;
-            const minOutputHeight = 100;
+            const minOutputHeight = 10;
             const maxEditorHeight = window.innerHeight - 160 - minOutputHeight;
             const maxOutputHeight = window.innerHeight - 160 - minEditorHeight;
             
@@ -189,6 +191,28 @@ class YzPlayground {
         });
     }
 
+    initializeOutputSection() {
+        // Start with output section minimized
+        this.outputSection.style.height = '30px';
+        this.outputSection.classList.remove('has-content');
+        this.updateStatus('ready', 'Ready');
+    }
+
+    bindFocusEvents() {
+        // Get the header element
+        const header = document.querySelector('.header');
+        
+        // Add focus event listener to make logo smaller
+        this.codeEditor.on('focus', () => {
+            header.classList.add('compact');
+        });
+        
+        // Add blur event listener to restore logo size
+        this.codeEditor.on('blur', () => {
+            header.classList.remove('compact');
+        });
+    }
+
     loadPreferences() {
         // Load complete settings from localStorage
         const savedSettings = localStorage.getItem('yz-playground-settings');
@@ -217,9 +241,9 @@ main : {
     println("Welcome to the Yz programming language!")
     
     // You can also do math
-    var x = 10
-    var y = 20
-    println("x + y =", x + y)
+    x : 10
+    y : 20
+    println("x + y = \`x + y\`")
 }`;
     }
 
@@ -290,8 +314,7 @@ main : {
     clearOutput() {
         this.outputContent.textContent = '';
         this.updateStatus('ready', 'Ready');
-        const outputSection = document.getElementById('output-section');
-        outputSection.classList.remove('has-content');
+        this.hideOutput();
     }
 
     copyLink() {
@@ -311,12 +334,26 @@ main : {
         const outputSection = document.getElementById('output-section');
         outputSection.classList.remove('hidden');
         outputSection.classList.add('has-content');
+        
+        // Expand the output section if it's minimized
+        if (outputSection.offsetHeight < 100) {
+            outputSection.style.height = '300px';
+            // Refresh CodeMirror to adjust to new height
+            if (this.codeEditor) {
+                this.codeEditor.refresh();
+            }
+        }
     }
 
     hideOutput() {
         const outputSection = document.getElementById('output-section');
-        outputSection.classList.add('hidden');
         outputSection.classList.remove('has-content');
+        // Don't actually hide it, just minimize it
+        outputSection.style.height = '30px';
+        // Refresh CodeMirror to adjust to new height
+        if (this.codeEditor) {
+            this.codeEditor.refresh();
+        }
     }
 
     shareCode() {
